@@ -15,4 +15,6 @@ Route::group([
 
     $router->resource('users', UsersController::class);
     $router->resource('devices', DevicesController::class);
+    $router->resource('groups', GroupsController::class);
+    $router->resource('accounts', AccountsController::class);
 });

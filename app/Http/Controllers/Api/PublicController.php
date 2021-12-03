@@ -30,7 +30,7 @@ class PublicController extends Controller{
 
 		$user 		= User::find($token['id']);
 		if($user->endtime && $user->endtime < time()){
-			return Responses::error('您的授权已到期!');
+			return Responses::error('您的授权已到期!', null, 200, 401);
 		}
 
 		$rs 		= Device::bind($imei, $user, $info);

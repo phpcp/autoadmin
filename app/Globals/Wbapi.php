@@ -1,5 +1,6 @@
 <?php
 namespace App\Globals;
+use GuzzleHttp;
 /**
  * 请求ws封装
  */
@@ -16,11 +17,11 @@ class WbApi{
      *      如果执行任务, 一维必须有的键, type, code, msg, data
      *      内部 data 必须有 file, quality, id, req_time, config 键
      */
-    public static function Send($uid, $deviceId, $data, $type = 'send'){
+    public static function Send($uid, $deviceId = '', $data = null, $type = 'send'){
         try {
             // $aarr   = ['type'=>'doiyinyanghao', 'data'=>['config' => ['dianzan'=> 0.2,'seetime'=> [3, 20], 'comments_probability' => 0.1, 'comments' => ['不错哦','喜欢这个视频','怎么拍的?', '挺好的'], 'videos' => [10, 50]], 'quality'=>2, 'file' => 'robot.douyin', 'id' => 1, 'req_time' => time()], 'code' => 200, 'msg' => '', 'noreback' => false];
             // $aarr    = ['type'=>'stop', 'data'=>[1], 'code' => 200, 'msg' => '', 'noreback' => false];
-            if(!is_string($data)){
+            if($data && !is_string($data)){
                 $data   = json_encode($data);
             }
             $http = new GuzzleHttp\Client;

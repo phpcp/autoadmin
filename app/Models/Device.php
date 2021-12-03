@@ -10,6 +10,10 @@ use App\Models\User;
 class Device extends Model{
 	use HasFactory;
 
+	public function account(){
+		return $this->hasMany(Account::class, 'did');
+	}
+
 	// 获取设备
 	public static function bind(string $imei, User $user, $info = null){
 		$device 	= self::where('imei', $imei)->first();
@@ -18,6 +22,11 @@ class Device extends Model{
 			if($user->id != $device->uid){
 				return '请先后台解绑!';
 			}
+			if(is_array($info)){
+				$info 		= json_encode($info);
+			}
+			$device->info 	= $info;
+			$device->save();
 			return $device;
 		}else{
 			$binded 	= self::where('uid', $user->id)->count();

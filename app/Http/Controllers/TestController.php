@@ -30,6 +30,27 @@ class TestController extends Controller{
     	echo $data;
 
 
+
+   //  	try {
+   //  		$aarr 	= ['type'=>'doiyinyanghao', 'data'=>['config' => ['dianzan'=> 0.2,'seetime'=> [3, 20], 'comments_probability' => 0.1, 'comments' => ['不错哦','喜欢这个视频','怎么拍的?', '挺好的'], 'videos' => [10, 50]], 'quality'=>2, 'file' => 'robot.douyin', 'id' => 1, 'req_time' => time()], 'code' => 200, 'msg' => '', 'noreback' => false];
+   //  		// $aarr 	= ['type'=>'stop', 'data'=>[1], 'code' => 200, 'msg' => '', 'noreback' => false];
+   //  		$http = new GuzzleHttp\Client;
+			// $response = $http->post('http://192.168.31.172:11223/servs', [
+			//     'form_params' => [
+			//     	'id'	=> 1,
+			//     	'did'	=> '8,9,7,10',
+			//         'type' 	=> 'zzz',
+			//         'data' 	=> json_encode($aarr),
+			//     ],
+			// ]);
+			// $res 	= (string)$response->getBody();
+			// dd($res);
+   //  	} catch (\Exception $e) {
+   //  		echo $e->getMessage();
+   //  	}
+		
+
+
     	$result = Builder::create()
 		    ->writer(new PngWriter())
 		    ->writerOptions([])
