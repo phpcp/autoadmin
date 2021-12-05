@@ -33,16 +33,20 @@ class DevicesController extends AdminController
         ];
 
         $uid        = Admin::user()->id;
-        $rs         = WbApi::Send($uid, '', '', 'status');
-        $rs         = json_decode($rs, true);
-        $rs         = $rs['dids'] ?? null;
-        $dids       = [];
-        if($rs){
-            $dids   = explode(',', $rs);
-            Device::where('uid', $uid)->update(['status' => 0]);
-            Device::where('uid', $uid)->whereIn('id', $dids)->update(['status' => 1]);
-        }else{
-            Device::where('uid', $uid)->update(['status' => 0]);
+        try {
+            $rs         = WbApi::Send($uid, '', '', 'status');
+            $rs         = json_decode($rs, true);
+            $rs         = $rs['dids'] ?? null;
+            $dids       = [];
+            if($rs){
+                $dids   = explode(',', $rs);
+                Device::where('uid', $uid)->update(['status' => 0]);
+                Device::where('uid', $uid)->whereIn('id', $dids)->update(['status' => 1]);
+            }else{
+                Device::where('uid', $uid)->update(['status' => 0]);
+            }
+        } catch (\Exception $e) {
+            
         }
 
         $grid = new Grid(new Device());
