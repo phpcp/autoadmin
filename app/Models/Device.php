@@ -37,6 +37,7 @@ class Device extends Model{
 			$device->uid 	= $user->id;
 			$device->imei 	= $imei;
 			$device->number = $binded + 1;
+			$device->user_num = $device->number;
 			if(is_array($info)){
 				$info 		= json_encode($info);
 			}

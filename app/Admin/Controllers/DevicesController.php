@@ -19,15 +19,14 @@ class DevicesController extends AdminController
      *
      * @var string
      */
-    protected $title = '设备列表';
+    protected $title = '接入手机';
 
     /**
      * Make a grid builder.
      *
      * @return Grid
      */
-    protected function grid()
-    {
+    protected function grid(){
         $states = [
             'on'  => ['value' => 1, 'text' => '锁定', 'color' => 'primary'],
             'off' => ['value' => 0, 'text' => '关闭', 'color' => 'default'],
@@ -62,10 +61,10 @@ class DevicesController extends AdminController
 
         $grid->column('accounts', __('账号数'))->modal('该设备下登录的账号', function ($model) {
             $comments = $model->account()->take(10)->get()->map(function ($comment) {
-                return $comment->only(['id', 'username', 'uuid', 'fensi', 'zuopin']);
+                return $comment->only(['id', 'nickname', 'uuid', 'follower_count', 'total_favorited', 'aweme_count']);
             });
 
-            return new Table(['ID', '用户名', '账号', '粉丝数', '作品数'], $comments->toArray());
+            return new Table(['ID', '用户名', '账号', '粉丝数', '获赞数', '作品数'], $comments->toArray());
         })->sortable();
         $grid->column('remark', __('备注'))->editable()->filter();
         $grid->column('brand', __('品牌'))->display(function(){
@@ -74,21 +73,21 @@ class DevicesController extends AdminController
                 return $info['brand'] ?? null;
             }
             return '';
-        })->filter();
+        });
         $grid->column('model', __('型号'))->display(function(){
             if($this->info){
                 $info   = json_decode($this->info, true);
                 return $info['model'] ?? null;
             }
             return '';
-        })->filter();
+        });
         $grid->column('system', __('系统版本'))->display(function(){
             if($this->info){
                 $info   = json_decode($this->info, true);
                 return $info['system'] ?? null;
             }
             return '';
-        })->filter();
+        });
         $grid->column('jiaoben', __('脚本版本'))->display(function(){
             if($this->info){
                 $info   = json_decode($this->info, true);
@@ -98,14 +97,14 @@ class DevicesController extends AdminController
                 return 'v1.0.0';
             }
             return '';
-        })->filter();
+        });
         $grid->column('lang', __('手机语言'))->display(function(){
             if($this->info){
                 $info   = json_decode($this->info, true);
                 return $info['language'] ?? null;
             }
             return '';
-        })->filter();
+        });
         $grid->column('rado', __('屏幕'))->display(function(){
             if($this->info){
                 $info   = json_decode($this->info, true);

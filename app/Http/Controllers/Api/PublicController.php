@@ -41,7 +41,7 @@ class PublicController extends Controller{
 		$user->updated_at 	= date('Y-m-d H:i:s');
 		$user->save();
 		$newToken 	= Ens::encrypt(['id' => $user->id, 'login' => time()], true);
-		return Responses::success(['token' => $newToken, 'num' => $rs->user_num ? $rs->user_num : $rs->number, 'id' => $user->id, 'did' => $rs->id]);
+		return Responses::success(['token' => $newToken, 'num' => $rs->user_num, 'id' => $user->id, 'did' => $rs->id]);
 	}
 	public function connect(Request $request){
 		$token 	= $request->input('token');
@@ -67,6 +67,16 @@ class PublicController extends Controller{
 			return Responses::error($rs);
 		}
 
-		return Responses::success(['num' => $rs->user_num ? $rs->user_num : $rs->number, 'id' => $user->id, 'did' => $rs->id]);
+		return Responses::success(['num' => $rs->user_num, 'id' => $user->id, 'did' => $rs->id]);
+	}
+
+	//
+	public function closetxt(Request $request){
+		$arr 	= [
+			'我知道了',
+			'以后再说',
+			'拒绝'
+		];
+		return Responses::success($arr);
 	}
 }

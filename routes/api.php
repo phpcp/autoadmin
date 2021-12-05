@@ -47,6 +47,8 @@ Route::group([
 	Route::post('/connect', 'PublicController@connect')->name('connect');
 	Route::post('/scan', 'PublicController@scan')->name('scan');
 	Route::post('/doiyinyanghao', 'DouyinController@doiyinyanghao')->name('doiyinyanghao');
+	Route::post('/getCloseTxt', 'PublicController@closetxt')->name('closetxt');
+	Route::post('/deviceLoginUsers', 'DevicesController@deviceusers')->name('deviceusers');
 });
 
 // Route::post('/connect', function(Request $request){

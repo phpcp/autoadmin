@@ -23,7 +23,9 @@ class Responses{
     public static function resp($msg = '', $data = null, $code = 200, $httpcode = 200){
         if(is_array($data)){
             if(isset($data[0])){
-                $data['list']   = $data;
+                $dd             = $data;
+                $data           = [];
+                $data['list']   = $dd;
             }
         }
         $arr        = [
