@@ -12,13 +12,17 @@ use App\Models\Device;
 class PublicController extends Controller{
 	public function scan(Request $request){
 		$token 	= $request->input('token');
-		$imei 	= $request->input('imei');
-		$info 	= $request->input('info');
-		if(!$token || !$info || !$imei){
+		if(!$token){
 			return Responses::error('错误!', 405);
 		}
-		$info 	= base64_decode($info, true);
-		// $imei 	= $info['imei'];
+		$rrrs 	= json_decode(Ens::decrypt(base64_decode($token)), true);
+		$info 	= $rrrs['info'] ?? null;
+		$imei 	= $rrrs['imei'] ?? null;
+		$token 	= $rrrs['token'] ?? null;
+		if(!$info || !$imei || !$token){
+			return Responses::error('错误!', 405);
+		}
+
 		$token 	= Ens::decrypt($token);
 		$token 	= json_decode($token, true);
 		if(!isset($token['id']) || !isset($token['time'])){
@@ -40,20 +44,23 @@ class PublicController extends Controller{
 
 		$user->updated_at 	= date('Y-m-d H:i:s');
 		$user->save();
-		$newToken 	= Ens::encrypt(['id' => $user->id, 'login' => time()], true);
+		$newToken 	= base64_encode(Ens::encrypt(json_encode(['id' => $user->id, 'login' => time()])));
 		return Responses::success(['token' => $newToken, 'num' => $rs->user_num, 'id' => $user->id, 'did' => $rs->id]);
 	}
 	public function connect(Request $request){
 		$token 	= $request->input('token');
-		$imei 	= $request->input('imei');
-		$info 	= $request->input('info');
-		if(!$token || !$info || !$imei){
-			return Responses::error('错误!', null, 405, 405);
+		if(!$token){
+			return Responses::error('错误!', 405);
 		}
-		$info 	= base64_decode($info, true);
-		$token 	= Ens::decrypt($token, true);
+		$rrrs 	= json_decode(Ens::decrypt(base64_decode($token)), true);
+		$info 	= $rrrs['info'] ?? null;
+		$imei 	= $rrrs['imei'] ?? null;
+		$token 	= $rrrs['token'] ?? null;
+		if(!$info || !$imei || !$token){
+			return Responses::error('错误!', 405);
+		}
+		$token 	= Ens::decrypt(base64_decode($token));
 		$token 	= json_decode($token, true);
-
 		if(!isset($token['id']) || !isset($token['login'])){
 			return Responses::error('请登录!', null, 401, 401);
 		}
@@ -75,7 +82,12 @@ class PublicController extends Controller{
 		$arr 	= [
 			'我知道了',
 			'以后再说',
-			'拒绝'
+			'拒绝',
+			'同意',
+			'始终允许',
+			'好的',
+			'跳过广告',
+			'取消'
 		];
 		return Responses::success($arr);
 	}
