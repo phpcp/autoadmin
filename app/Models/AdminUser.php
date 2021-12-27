@@ -17,7 +17,7 @@ class AdminUser extends Model{
 		];
 		$loginToken = Ens::encrypt(json_encode($arr));
 		$arr 		= [
-			'ws'	=> 'ws://192.168.31.172:11223/client',
+			'ws'	=> env('WS_LINK_URL'),
 			'token'	=> $loginToken,
 		];
 		return Ens::encrypt(json_encode($arr));

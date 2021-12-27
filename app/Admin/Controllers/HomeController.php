@@ -49,7 +49,7 @@ class HomeController extends Controller
             'api'   => url('api/auth'),
             'token' => Ens::encrypt(json_encode(['id' => Admin::user()->id, 'time' => time()])),
         ];
-        print_r($arr);
+        // print_r($arr);
         $str    = json_encode($arr);
         $data   = Ens::encrypt($str);
 
