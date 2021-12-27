@@ -97,6 +97,10 @@ class PublicController extends Controller{
 		if($user->endtime && $user->endtime <= time()){
 			return Responses::error('您的授权已到期!', null, 401, 200);
 		}
+		$binded 	= Device::where('admin_id', $user->id)->count();
+		if($binded >= $user->max_device){
+			return Responses::error('设备绑定已达上限!', null, 401, 200);
+		}
 		$token 		= AdminUser::token($user);
 		return Responses::success(['token' => $token, 'versionapi' => url('api/mksureversion'),'closetxtapi' => url('api/getCloseTxt')]);
 	}
