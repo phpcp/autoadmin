@@ -20,3 +20,4 @@ Route::get('/', function () {
 });
 
 Route::get('/qrcode', [TestController::class, 'index']);
+Route::get('/test', [TestController::class, 'test']);

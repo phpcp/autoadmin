@@ -11,7 +11,7 @@ class Ens{
     ];
     private static $method      = 'AES-128-CBC';
     private static $padding     = OPENSSL_RAW_DATA;
-    public static $timeout      = 300;// 5分钟有效
+    public static $timeout      = 180;// 5分钟有效
 
     /**
      * aes 加密

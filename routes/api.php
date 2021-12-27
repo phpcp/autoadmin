@@ -44,24 +44,11 @@ Route::group([
 	'namespace'		=> 'App\\Http\\Controllers\\Api',
 	'name'			=> 'api.'
 ],function(){
+	Route::post('/auth', 'PublicController@auth')->name('auth');
 	Route::post('/connect', 'PublicController@connect')->name('connect');
-	Route::post('/scan', 'PublicController@scan')->name('scan');
+	Route::post('/mksureversion', 'PublicController@tiktokVersion')->name('mksureversion');
+	// Route::post('/scan', 'PublicController@scan')->name('scan');
 	Route::post('/doiyinyanghao', 'DouyinController@doiyinyanghao')->name('doiyinyanghao');
 	Route::post('/getCloseTxt', 'PublicController@closetxt')->name('closetxt');
 	Route::post('/deviceLoginUsers', 'DevicesController@deviceusers')->name('deviceusers');
 });
-
-// Route::post('/connect', function(Request $request){
-// 	// return response('Hello World', 200)
-//  	//                  ->header('Content-Type', 'application/json');
-// 	$token 		= $request->input('token');
-
-// 	// $replace = ['+', '/'];
-//  //    $search = ['-', '_'];
-//     $str 	= openssl_decrypt($token, 'AES-128-CBC', '654mca0l38b489d9f306a5b8e105334b', OPENSSL_ZERO_PADDING, 'c5defg0045222c52');
-//     // $plaintext = substr($str, 0, strrpos($str, "}") + 1);
-//     // $nt 		= json_decode($plaintext, true);
-
-//     $arr 	= ['aaa' => 'bbbb'];
-// 	return response()->json($arr);
-// });

@@ -28,6 +28,9 @@ class Responses{
                 $data['list']   = $dd;
             }
         }
+        if(!$data){
+            $data   = [];
+        }
         $arr        = [
             'code'  => $code,
             'msg'   => $msg,

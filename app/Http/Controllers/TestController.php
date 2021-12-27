@@ -30,7 +30,7 @@ class TestController extends Controller{
 
 
     	$arr 	= [
-    		'ws'	=> 'ws://192.168.31.172:11223/client',
+    		'ws'	=> 'ws://auto.mini.zhishukongjian.com:9130/client',
     		'token'	=> Ens::encrypt(json_encode(['id' => 1, 'time' => time()])),
     		// 'token'	=> ['id' => 1, 'time' => time()],
     	];
@@ -105,6 +105,51 @@ class TestController extends Controller{
 		    ->labelAlignment(new LabelAlignmentCenter())
 		    ->build();
 		return '<img src="' . $result->getDataUri() . '" /> <a href="">断开连接</a>';
+    }
+
+    public function test(Request $request){
+    	// $url 	= 'https://vm.tiktok.com/ZM8vuwYQL/';
+    	// $url 	= 'https://vm.tiktok.com/ZM8vu33yW/';
+     //  $url  = 'https://vm.tiktok.com/TTPdjwjYGV/';
+    	// $http = new GuzzleHttp\Client;
+     //    $response = $http->post($url, [
+     //        'headers' => [
+     //            'Accept-Language'    => 'fr-CH,fr;q=0.5',
+     //            'pragma'   => 'no-cache',
+     //            'cache-control'  => 'no-cache',
+     //            'upgrade-insecure-requests'  => 1,
+     //            'User-Agent'    => 'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
+     //        ],
+     //    ]);
+     //    $res    = (string)$response->getBody();
+     //    file_put_contents(__DIR__. '/2.html', $res);
+     //    dd($response->getStatusCode());
+
+
+     // try {
+     //     $aarr   = ['type'=>'doiyinyanghao', 'data'=>['config' => ['dianzan'=> 0.2,'seetime'=> [3, 8], 'comments_probability' => 0.1, 'comments' => ['不错哦','喜欢这个视频','怎么拍的?', '挺好的'], 'videos' => [1, 3]], 'quality'=>0, 'file' => 'robot.douyin', 'id' => 1, 'req_time' => time()], 'code' => 200, 'msg' => '', 'noreback' => false];
+     //     // $aarr  = ['type'=>'stop', 'data'=>[1], 'code' => 200, 'msg' => '', 'noreback' => false];
+     //     $http = new GuzzleHttp\Client;
+     //    $response = $http->post('http://192.168.31.172:11223/servs', [
+     //        'form_params' => [
+     //         'id'  => 1,
+     //         'did' => '1,2,4,8,9,7,10',
+     //            'type'   => 'zzz',
+     //            'data'   => json_encode($aarr),
+     //        ],
+     //    ]);
+     //    $res   = (string)$response->getBody();
+     //    dd($res);
+     //   } catch (\Exception $e) {
+     //     echo $e->getMessage();
+     //   }
+
+
+
+    	$str 	= file_get_contents(__DIR__ . '/2.html');
+    	$reg 	= '`__INIT_PROPS__ = (.+?)</script>`';
+    	$aa 	= preg_match($reg, $str, $az);
+    	dd($az);
     }
 }
 

@@ -8,6 +8,8 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Models\Account;
+use App\Models\GroupDevice;
+use App\Models\DeviceToGroup;
 use Encore\Admin\Widgets\Table;
 use Encore\Admin\Facades\Admin;
 use App\Globals\WbApi;
@@ -19,7 +21,7 @@ class DevicesController extends AdminController
      *
      * @var string
      */
-    protected $title = '接入手机';
+    protected $title = '手机设备';
 
     /**
      * Make a grid builder.
@@ -37,18 +39,22 @@ class DevicesController extends AdminController
         $rs         = json_decode($rs, true);
         $rs         = $rs['dids'] ?? null;
         $dids       = [];
+
+        $groups     = GroupDevice::where('admin_id', $uid)->pluck('name', 'id')->toArray();
+        // $myDeviceGroups     = Group::where('admin_id', $uid)->where('type', 0);
+
         if($rs){
             $dids   = explode(',', $rs);
-            Device::where('uid', $uid)->update(['status' => 0]);
-            Device::where('uid', $uid)->whereIn('id', $dids)->update(['status' => 1]);
+            Device::where('admin_id', $uid)->update(['status' => 0]);
+            Device::where('admin_id', $uid)->whereIn('id', $dids)->update(['status' => 1]);
         }else{
-            Device::where('uid', $uid)->update(['status' => 0]);
+            Device::where('admin_id', $uid)->update(['status' => 0]);
         }
 
         $grid = new Grid(new Device());
         $grid->disableCreateButton();
         $grid->disableExport();
-        $grid->model()->where('uid', $uid)->orderByDesc('user_num')->orderByDesc('number');
+        $grid->model()->where('admin_id', $uid)->orderByDesc('user_num')->orderByDesc('number');
 
         $grid->column('id', __('Id'))->hide();
         // $grid->column('uid', __('Uid'));
@@ -57,7 +63,9 @@ class DevicesController extends AdminController
         // $grid->column('number', __('编号'));
         $grid->column('user_num', __('编号'))->display(function($nnm){
             return $nnm ? $nnm : $this->number;
-        })->editable();
+        })->editable()->sortable();
+        $grid->column('remark', __('备注'))->editable()->filter();
+        $grid->column('groups', __('所属组'))->checkbox($groups)->filter($groups);
 
         $grid->column('accounts', __('账号数'))->modal('该设备下登录的账号', function ($model) {
             $comments = $model->account()->take(10)->get()->map(function ($comment) {
@@ -66,7 +74,6 @@ class DevicesController extends AdminController
 
             return new Table(['ID', '用户名', '账号', '粉丝数', '获赞数', '作品数'], $comments->toArray());
         })->sortable();
-        $grid->column('remark', __('备注'))->editable()->filter();
         $grid->column('brand', __('品牌'))->display(function(){
             if($this->info){
                 $info   = json_decode($this->info, true);
@@ -126,8 +133,15 @@ class DevicesController extends AdminController
                 return '<span class="label label-default">离线</span>';
             }
         })->sortable();
-        // $grid->column('updated_at', __('Updated at'));
 
+        $grid->column('task', __('当前任务'))->display(function(){
+            return '暂无任务';
+        });
+        // $grid->column('updated_at', __('Updated at'));
+        $grid->disableActions();
+        $grid->batchActions(function ($batch) {
+            $batch->disableDelete();
+        });
         return $grid;
     }
 
@@ -141,17 +155,17 @@ class DevicesController extends AdminController
     {
         $show = new Show(Device::findOrFail($id));
 
-        $show->field('id', __('Id'));
-        $show->field('uid', __('Uid'));
-        $show->field('imei', __('Imei'));
-        $show->field('info', __('Info'));
-        $show->field('remark', __('Remark'));
-        $show->field('number', __('Number'));
-        $show->field('user_num', __('User num'));
-        $show->field('history_uid', __('History uid'));
-        $show->field('lock', __('Lock'));
-        $show->field('created_at', __('Created at'));
-        $show->field('updated_at', __('Updated at'));
+        // $show->field('id', __('Id'));
+        // $show->field('uid', __('Uid'));
+        // $show->field('imei', __('Imei'));
+        // $show->field('info', __('Info'));
+        // $show->field('remark', __('Remark'));
+        // $show->field('number', __('Number'));
+        // $show->field('user_num', __('User num'));
+        // $show->field('history_uid', __('History uid'));
+        // $show->field('lock', __('Lock'));
+        // $show->field('created_at', __('Created at'));
+        // $show->field('updated_at', __('Updated at'));
 
         return $show;
     }
@@ -165,15 +179,35 @@ class DevicesController extends AdminController
     {
         $form = new Form(new Device());
 
-        $form->number('uid', __('Uid'));
-        $form->text('imei', __('Imei'));
+        $form->number('id', __('id'));
+        // $form->number('uid', __('Uid'));
+        $form->checkbox('groups', __('所属组'))->options(GroupDevice::where('admin_id', Admin::user()->id)->pluck('name', 'id')->toArray());
+        // $form->text('imei', __('Imei'));
         $form->textarea('info', __('Info'));
         $form->text('remark', __('Remark'));
-        $form->number('number', __('Number'));
+        // $form->number('number', __('Number'));
         $form->number('user_num', __('User num'));
         $form->textarea('history_uid', __('History uid'));
         $form->switch('lock', __('Lock'));
 
+        // $form->text('groups', __('组'));
+
+        // $form->saving(function (Form $form) {
+        //     dd($form);
+        // });
+        $form->saved(function(Form $form){
+            DeviceToGroup::where('id', $form->model()->id)->delete();
+            $arr    = [];
+            if($form->groups){
+                foreach($form->groups as $item){
+                    $arr[]  = ['id' => $form->model()->id, 'gid' => $item];
+                }
+                DeviceToGroup::insert($arr);
+            }
+            GroupDevice::countDevice(Admin::user()->id);
+        });
+
         return $form;
     }
 }
+
