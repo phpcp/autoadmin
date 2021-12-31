@@ -321,7 +321,14 @@ class TaskListsController extends AdminController
             $accounts       = [];
             if($tskType->isdevice != 1){
                 if($form->model()->account_id){
-                    $accounts   = Account::whereIn('id', $form->model()->account_id)->pluck('id', 'did')->toArray();
+                    $tmp        = Account::whereIn('id', $form->model()->account_id)->get();
+                    foreach($tmp as $item){
+                        if(!isset($accounts[$item->did])){
+                            $accounts[$item->did]   = [];
+                        }
+                        $accounts[$item->did][]     = $item->nickname;
+                    }
+                    // $accounts   = Account::whereIn('id', $form->model()->account_id)->pluck('nickname', 'did')->toArray();
                 }
             }
 

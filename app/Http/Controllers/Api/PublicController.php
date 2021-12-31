@@ -9,6 +9,7 @@ use App\Globals\Responses;
 use App\Models\AdminUser;
 use App\Models\Device;
 use App\Models\TiktokVersionButton;
+use App\Models\LangToText;
 
 class PublicController extends Controller{
 	// public function scan(Request $request){
@@ -131,6 +132,7 @@ class PublicController extends Controller{
 				return Responses::error('错误!');
 			}else{
 				$data 	= json_decode($row->ids, true);
+				$
 				return Responses::success($data);
 			}
 		}
