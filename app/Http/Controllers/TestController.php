@@ -131,7 +131,7 @@ class TestController extends Controller{
         $aarr   = ['type'=>'doiyinyanghao', 'data'=>['config' => ['dianzan'=> 0.2,'seetime'=> [3, 8], 'comments_probability' => 0.1, 'comments' => ['不错哦','喜欢这个视频','怎么拍的?', '挺好的'], 'videos' => [1, 3]], 'quality'=>0, 'file' => 'getaccounts', 'id' => 1, 'req_time' => time()], 'code' => 200, 'msg' => '', 'noreback' => false];
         // $aarr  = ['type'=>'stop', 'data'=>[1], 'code' => 200, 'msg' => '', 'noreback' => false];
         $http = new GuzzleHttp\Client;
-        $response = $http->post('http://192.168.31.172:11223/servs', [
+        $response = $http->post(env('TASK_API_URL'), [
           'form_params' => [
            'id'  => 1,
            'did' => '1,2,4,8,9,7,10',
