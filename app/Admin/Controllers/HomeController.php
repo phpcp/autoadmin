@@ -46,7 +46,7 @@ class HomeController extends Controller
     public function qrcode(){
         $arr    = [
             // 'ws'    => 'ws://192.168.31.172:11223/client',
-            'api'   => url('api/auth'),//'http://192.168.31.172:998/api/auth',//
+            'api'   => 'http://192.168.31.172:998/api/auth',//url('api/auth'),//
             'token' => Ens::encrypt(json_encode(['id' => Admin::user()->id, 'time' => time()])),
         ];
         // print_r($arr);

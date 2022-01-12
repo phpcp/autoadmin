@@ -58,7 +58,7 @@ class PublicController extends Controller{
 			return Responses::error('错误!', 405);
 		}
 		$rrrs 		= json_decode(Ens::decrypt(base64_decode($token)), true);
-		// file_put_contents(__DIR__ . '/1.txt', json_encode($rrrs));
+		// file_put_contents(__DIR__ . '/1.txt', json_encode($rrrs) . "\r\n" . $token);
 		$info 		= $rrrs['info'] ?? null;
 		$imei 		= $rrrs['imei'] ?? null;
 		$version 	= $rrrs['version'] ?? null;
@@ -70,6 +70,7 @@ class PublicController extends Controller{
 		if(!$version || !$lang || !is_string($version) ||!is_string($lang)){
 			return Responses::error('app信息缺失!.', 405);
 		}
+		$token 	= base64_decode($token);
 		$token 	= Ens::decrypt($token);
 		$token 	= json_decode($token, true);
 		if(!isset($token['id']) || !isset($token['login'])){
