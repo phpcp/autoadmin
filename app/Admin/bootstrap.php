@@ -23,6 +23,7 @@ Admin::js('/layer/layer.js');
 
 Admin::navbar(function (\Encore\Admin\Widgets\Navbar $navbar) {
     // $navbar->left('html...');
+    $navbar->right(view('aes'));
     $navbar->right(view('qrcode'));
     $navbar->right(view('downloads'));
 

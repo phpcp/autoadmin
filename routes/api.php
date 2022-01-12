@@ -46,9 +46,13 @@ Route::group([
 ],function(){
 	Route::post('/auth', 'PublicController@auth')->name('auth');
 	Route::post('/connect', 'PublicController@connect')->name('connect');
+	// Route::post('/setvl', 'PublicController@setvl')->name('setvl');
 	Route::post('/mksureversion', 'PublicController@tiktokVersion')->name('mksureversion');
 	// Route::post('/scan', 'PublicController@scan')->name('scan');
 	Route::post('/doiyinyanghao', 'DouyinController@doiyinyanghao')->name('doiyinyanghao');
 	Route::post('/getCloseTxt', 'PublicController@closetxt')->name('closetxt');
 	Route::post('/deviceLoginUsers', 'DevicesController@deviceusers')->name('deviceusers');
+	Route::post('/topcaccounts', 'PublicController@topcaccounts')->name('topcaccounts');
+	Route::post('/uploaded', 'PublicController@uploaded')->name('uploaded');
+	Route::post('/start', 'PublicController@start')->name('start');
 });

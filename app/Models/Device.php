@@ -26,7 +26,7 @@ class Device extends Model{
 	}
 
 	// 获取设备
-	public static function bind(string $imei, AdminUser $user, $info = null){
+	public static function bind(string $imei, AdminUser $user, $info = null, $version = null, $lang = null){
 		$device 	= self::where('imei', $imei)->first();
 
 		if($device){
@@ -37,6 +37,12 @@ class Device extends Model{
 				$info 		= json_encode($info);
 			}
 			$device->info 	= $info;
+			if(!$device->soft_version){
+				$device->soft_version 	= $version;
+			}
+			if(!$device->soft_lang){
+				$device->soft_lang 		= $lang;
+			}
 			$device->save();
 			return $device;
 		}else{
@@ -53,6 +59,8 @@ class Device extends Model{
 				$info 		= json_encode($info);
 			}
 			$device->info 	= $info;
+			$device->soft_version 	= $version;
+			$device->soft_lang 		= $lang;
 			if(!$device->save()){
 				return '设备绑定失败!';
 			}

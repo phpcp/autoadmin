@@ -126,33 +126,51 @@ class TestController extends Controller{
      //    dd($response->getStatusCode());
 
 
-     // try {
-     //     $aarr   = ['type'=>'doiyinyanghao', 'data'=>['config' => ['dianzan'=> 0.2,'seetime'=> [3, 8], 'comments_probability' => 0.1, 'comments' => ['不错哦','喜欢这个视频','怎么拍的?', '挺好的'], 'videos' => [1, 3]], 'quality'=>0, 'file' => 'robot.douyin', 'id' => 1, 'req_time' => time()], 'code' => 200, 'msg' => '', 'noreback' => false];
-     //     // $aarr  = ['type'=>'stop', 'data'=>[1], 'code' => 200, 'msg' => '', 'noreback' => false];
-     //     $http = new GuzzleHttp\Client;
-     //    $response = $http->post('http://192.168.31.172:11223/servs', [
-     //        'form_params' => [
-     //         'id'  => 1,
-     //         'did' => '1,2,4,8,9,7,10',
-     //            'type'   => 'zzz',
-     //            'data'   => json_encode($aarr),
-     //        ],
-     //    ]);
-     //    $res   = (string)$response->getBody();
-     //    dd($res);
-     //   } catch (\Exception $e) {
-     //     echo $e->getMessage();
-     //   }
+     try {
+        // $aarr   = ['type'=>'doiyinyanghao', 'data'=>['config' => ['dianzan'=> 0.2,'seetime'=> [3, 8], 'comments_probability' => 0.1, 'comments' => ['不错哦','喜欢这个视频','怎么拍的?', '挺好的'], 'videos' => [1, 3]], 'quality'=>0, 'file' => 'robot.douyin', 'id' => 1, 'req_time' => time()], 'code' => 200, 'msg' => '', 'noreback' => false];
+        $aarr   = ['type'=>'doiyinyanghao', 'data'=>['config' => ['dianzan'=> 0.2,'seetime'=> [3, 8], 'comments_probability' => 0.1, 'comments' => ['不错哦','喜欢这个视频','怎么拍的?', '挺好的'], 'videos' => [1, 3]], 'quality'=>0, 'file' => 'getaccounts', 'id' => 1, 'req_time' => time()], 'code' => 200, 'msg' => '', 'noreback' => false];
+        // $aarr  = ['type'=>'stop', 'data'=>[1], 'code' => 200, 'msg' => '', 'noreback' => false];
+        $http = new GuzzleHttp\Client;
+        $response = $http->post('http://192.168.31.172:11223/servs', [
+          'form_params' => [
+           'id'  => 1,
+           'did' => '1,2,4,8,9,7,10',
+              'type'   => 'zzz',
+              'data'   => json_encode($aarr),
+          ],
+        ]);
+        $res   = (string)$response->getBody();
+        dd($res);
+      } catch (\Exception $e) {
+        echo $e->getMessage();
+      }
 
 
 
-    	$str 	= file_get_contents(__DIR__ . '/2.html');
-    	$reg 	= '`__INIT_PROPS__ = (.+?)</script>`';
-    	$aa 	= preg_match($reg, $str, $az);
-    	dd($az);
+    	// $str 	= file_get_contents(__DIR__ . '/2.html');
+    	// $reg 	= '`__INIT_PROPS__ = (.+?)</script>`';
+    	// $aa 	= preg_match($reg, $str, $az);
+    	// dd($az);
+        $url  = 'https://www.douyin.com/video/7048416563732417827';
+        // $url  = 'https://aweme.snssdk.com/aweme/v1/playwm/?video_id=v0d00fg10000c78g2v3c77u77hvrr38g&ratio=720p&line=0';
+        $http = new GuzzleHttp\Client;
+        $response = $http->get($url, [
+            'headers' => [
+                'Accept-Language'    => 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7',
+                'pragma'   => 'no-cache',
+                'cache-control'  => 'no-cache',
+                'cookie'  => '__ac_nonce=061d40e7c0077022b68b6; __ac_signature=_02B4Z6wo00f01N8v9qAAAIDBvCU2yjy1uUTfD.IAAFYl49; __ac_referer=__ac_blank',
+                'upgrade-insecure-requests'  => 1,
+                'User-Agent'    => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36',
+            ],
+        ]);
+        $res    = (string)$response->getBody();
+        // file_put_contents(__DIR__. '/2.html', $res);
+        dd($res);
     }
 }
 
+//https://aweme.snssdk.com/aweme/v1/playwm/?video_id=v0d00fg10000c78g2v3c77u77hvrr38g&ratio=720p&line=0
 
 // - [公司英文名字].福州质数空间信息科技有限公司, Fuzhou Zhishukongjian Information Technology Co.
 // - Address: [ 福建省福州市台江区广达路68号金源大广场西区17层K单元(04) ]（公司注册地址）

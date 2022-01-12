@@ -10,6 +10,8 @@ use Encore\Admin\Show;
 use App\Models\Account;
 use App\Models\GroupDevice;
 use App\Models\DeviceToGroup;
+use App\Models\LangToText;
+use App\Models\TiktokVersionButton;
 use Encore\Admin\Widgets\Table;
 use Encore\Admin\Facades\Admin;
 use App\Globals\WbApi;
@@ -34,11 +36,20 @@ class DevicesController extends AdminController
             'off' => ['value' => 0, 'text' => '关闭', 'color' => 'default'],
         ];
 
+// $tktxts     = LangToText::where('lang', 'english')->where(function($query){
+//             $query->whereRaw('version is null')->orWhere('version', '22.6.4');
+//         })->orderBy('version', 'asc')->pluck('val', 'key')->toArray();
+// dd($tktxts);
+
         $uid        = Admin::user()->id;
         $rs         = WbApi::Send($uid, '', '', 'status');
         $rs         = json_decode($rs, true);
         $rs         = $rs['dids'] ?? null;
         $dids       = [];
+
+        $allowerLangs   = LangToText::select('lang')->groupBy('lang')->pluck('lang', 'lang')->toArray();
+        $allowerVers    = TiktokVersionButton::select('version')->groupBy('version')->pluck('version', 'version')->toArray();
+        // dd($allowerVers);
 
         $groups     = GroupDevice::where('admin_id', $uid)->pluck('name', 'id')->toArray();
         // $myDeviceGroups     = Group::where('admin_id', $uid)->where('type', 0);
@@ -67,6 +78,10 @@ class DevicesController extends AdminController
         $grid->column('remark', __('备注'))->editable()->filter();
         $grid->column('groups', __('所属组'))->checkbox($groups)->filter($groups);
 
+        // dd($allowerVers);
+        $grid->column('soft_version', __('app版本'))->editable('select', $allowerVers)->filter($allowerVers);
+        $grid->column('soft_lang', __('app语言'))->editable('select', $allowerLangs)->filter($allowerLangs);
+
         $grid->column('accounts', __('账号数'))->modal('该设备下登录的账号', function ($model) {
             $comments = $model->account()->take(10)->get()->map(function ($comment) {
                 return $comment->only(['id', 'nickname', 'uuid', 'follower_count', 'total_favorited', 'aweme_count']);
@@ -94,7 +109,7 @@ class DevicesController extends AdminController
                 return $info['system'] ?? null;
             }
             return '';
-        });
+        })->hide();
         $grid->column('jiaoben', __('脚本版本'))->display(function(){
             if($this->info){
                 $info   = json_decode($this->info, true);
@@ -104,7 +119,7 @@ class DevicesController extends AdminController
                 return 'v1.0.0';
             }
             return '';
-        });
+        })->hide();
         $grid->column('lang', __('手机语言'))->display(function(){
             if($this->info){
                 $info   = json_decode($this->info, true);
@@ -120,10 +135,10 @@ class DevicesController extends AdminController
                 return $w . '* ' . $h;
             }
             return '';
-        });
+        })->hide();
         // $grid->column('history_uid', __('History uid'));
         $grid->column('lock', __('是否锁定'))->switch($states)->sortable();
-        $grid->column('created_at', __('首次连接'))->display(function($str){
+        $grid->column('created_at', __('首次登录'))->display(function($str){
             return date('Y-m-d H:i:s', strtotime($str));
         })->sortable();
         $grid->column('status', __('设备状态'))->display(function($status){
@@ -189,6 +204,8 @@ class DevicesController extends AdminController
         $form->number('user_num', __('User num'));
         $form->textarea('history_uid', __('History uid'));
         $form->switch('lock', __('Lock'));
+        $form->select('soft_version', __('app版本'));
+        $form->select('soft_lang', __('app语言'));
 
         // $form->text('groups', __('组'));
 
