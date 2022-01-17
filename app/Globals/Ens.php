@@ -9,7 +9,8 @@ class Ens{
             'iv'    => '0zfeYUf5HP2qaZ8d',
         ],
     ];
-    private static $method      = 'AES-128-CBC';
+    // private static $method      = 'AES-128-ECB';
+    private static $method      = 'AES-128-ECB';
     private static $padding     = OPENSSL_RAW_DATA;
     public static $timeout      = 180;// 5分钟有效
 
@@ -35,7 +36,10 @@ class Ens{
         // return $res;
         $key        = self::$versionKeys[$versioncode]['key'];
         $iv         = self::$versionKeys[$versioncode]['iv'];
-        return base64_encode(openssl_encrypt($str,self::$method,$key,true,$iv));
+        if(self::$method == 'AES-128-ECB'){
+            return base64_encode(openssl_encrypt($str,self::$method,$key, self::$padding));
+        }
+        return base64_encode(openssl_encrypt($str,self::$method,$key, self::$padding,$iv));
     }
 
     /**
@@ -44,7 +48,10 @@ class Ens{
     public static function decrypt($token, $versioncode = 100){
         $key        = self::$versionKeys[$versioncode]['key'];
         $iv         = self::$versionKeys[$versioncode]['iv'];
-        return openssl_decrypt(base64_decode($token),self::$method,$key,true,$iv);
+         if(self::$method == 'AES-128-ECB'){
+            return openssl_decrypt(base64_decode($token),self::$method,$key, self::$padding);
+        }
+        return openssl_decrypt(base64_decode($token),self::$method,$key, self::$padding,$iv);
         // if(!isset(self::$versionKeys[$versioncode])){
         //     return false;
         // }

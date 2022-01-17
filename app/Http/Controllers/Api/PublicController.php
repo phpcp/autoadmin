@@ -67,10 +67,10 @@ class PublicController extends Controller{
 		if(!$info || !$imei || !$token){
 			return Responses::error('错误.', 405);
 		}
-		if(!$version || !$lang || !is_string($version) ||!is_string($lang)){
+		if($version === null || $lang === null){
 			return Responses::error('app信息缺失!.', 405);
 		}
-		$token 	= base64_decode($token);
+		// $token 	= base64_decode($token);
 		$token 	= Ens::decrypt($token);
 		$token 	= json_decode($token, true);
 		if(!isset($token['id']) || !isset($token['login'])){
@@ -145,20 +145,28 @@ class PublicController extends Controller{
 		$lang 		= null;
 		$deviceRow 	= Device::where('admin_id', $user->id)->where('imei', $imei)->first();
 		if(!$deviceRow){
-			$binded 	= Device::where('admin_id', $user->id)->where('imei', '!=', $imei)->count();
-			if($binded >= $user->max_device){
-				return Responses::error('设备绑定已达上限!', null, 401, 200);
+			// $binded 	= Device::where('admin_id', $user->id)->where('imei', '!=', $imei)->count();
+			// if($binded >= $user->max_device){
+			// 	return Responses::error('设备绑定已达上限!', null, 401, 200);
+			// }
+			// Device::bind($imei, $user, $info, strtolower($version), strtolower($lang));
+			$deviceRow 		= Device::bind($imei, $user, [], strtolower($version), strtolower($lang));
+			if(!$deviceRow instanceof Device){
+				return Responses::error($deviceRow);
 			}
 		}else{
 			$version 	= $deviceRow->soft_version;
 			$lang 		= $deviceRow->soft_lang;
 		}
+		if(!$version || !$lang){
+			return Responses::error('请现在后台设置tk对应的版本和语言! 编号: ' . $deviceRow->user_num);
+		}
 
 		$token 		= AdminUser::token($user);
 		return Responses::success([
 			'token' 		=> $token,
-			'versionapi' 	=> url('api/mksureversion'),
-			'closetxtapi' 	=> url('api/getCloseTxt'),
+			// 'versionapi' 	=> url('api/mksureversion'),
+			// 'closetxtapi' 	=> url('api/getCloseTxt'),
 			'appversion' 	=> $version,
 			'applang'		=> $lang,
 		]);

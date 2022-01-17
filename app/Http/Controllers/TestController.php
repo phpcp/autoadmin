@@ -128,7 +128,7 @@ class TestController extends Controller{
 
      try {
         // $aarr   = ['type'=>'doiyinyanghao', 'data'=>['config' => ['dianzan'=> 0.2,'seetime'=> [3, 8], 'comments_probability' => 0.1, 'comments' => ['不错哦','喜欢这个视频','怎么拍的?', '挺好的'], 'videos' => [1, 3]], 'quality'=>0, 'file' => 'robot.douyin', 'id' => 1, 'req_time' => time()], 'code' => 200, 'msg' => '', 'noreback' => false];
-        $aarr   = ['type'=>'doiyinyanghao', 'data'=>['config' => ['dianzan'=> 0.2,'seetime'=> [3, 8], 'comments_probability' => 0.1, 'comments' => ['不错哦','喜欢这个视频','怎么拍的?', '挺好的'], 'videos' => [1, 3]], 'quality'=>0, 'file' => 'getaccounts', 'id' => 1, 'req_time' => time()], 'code' => 200, 'msg' => '', 'noreback' => false];
+        $aarr   = ['type'=>'accounts', 'data'=>['config' => ['dianzan'=> 0.2,'seetime'=> [3, 8], 'comments_probability' => 0.1, 'comments' => ['不错哦','喜欢这个视频','怎么拍的?', '挺好的'], 'videos' => [1, 3]], 'quality'=>0, 'file' => 'getaccounts', 'id' => 1, 'req_time' => time()], 'code' => 200, 'msg' => '', 'noreback' => false];
         // $aarr  = ['type'=>'stop', 'data'=>[1], 'code' => 200, 'msg' => '', 'noreback' => false];
         $http = new GuzzleHttp\Client;
         $response = $http->post(env('TASK_API_URL'), [
@@ -144,7 +144,7 @@ class TestController extends Controller{
       } catch (\Exception $e) {
         echo $e->getMessage();
       }
-
+// ./wss --api https://auto.mini.zhishukongjian.com/api/
 
 
     	// $str 	= file_get_contents(__DIR__ . '/2.html');

@@ -44,14 +44,16 @@ class HomeController extends Controller
     }
 
     public function qrcode(){
+        $ntime  = time();
         $arr    = [
-            // 'ws'    => 'ws://192.168.31.172:11223/client',
             'api'   => url('api/auth'),//'http://192.168.31.172:998/api/auth',//
-            'token' => Ens::encrypt(json_encode(['id' => Admin::user()->id, 'time' => time()])),
+            'token' => Ens::encrypt(json_encode(['id' => Admin::user()->id, 'time' => $ntime])),
         ];
+        // echo json_encode(['id' => Admin::user()->id, 'time' => $ntime]);
         // print_r($arr);
         $str    = json_encode($arr);
         $data   = Ens::encrypt($str);
+        echo $data;
 
         $timeout    = date('H:i:s', strtotime('+'.env('QRCODE_TIMEOUT', 180).' seconds'));
         $result = Builder::create()
