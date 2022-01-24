@@ -24,6 +24,11 @@ class WbApi{
             if($data && !is_string($data)){
                 $data   = json_encode($data);
             }
+            if(is_array($deviceId)){
+                $deviceId   = implode(',', $deviceId);
+            }
+            // print_r($data);
+            // print_r($deviceId);
             $http = new GuzzleHttp\Client;
             $response = $http->post(env('TASK_API_URL'), [
                 'form_params' => [

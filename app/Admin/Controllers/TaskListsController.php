@@ -17,6 +17,7 @@ use App\Models\GroupAccount;
 use App\Models\AccountToGroup;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\MessageBag;
+use App\Globals\WbApi;
 
 class TaskListsController extends AdminController
 {
@@ -143,9 +144,10 @@ class TaskListsController extends AdminController
             ];
             $form->text('name', __('任务名称'))->required()->rules('max:30');
             $form->number('quality', __('任务权重'))->default(0)->help('数值越大,优先级越高!');
-            
             $form->hidden('status', __('任务进度'));
+            $form->number('need_times', __('执行次数'))->help('0为不限次数');
             $form->switch('active', __('任务状态'))->states($states)->default(1);
+
             $form->divider('发布目标选择,系统将自动去重');
             $form->multipleSelect('dg', __('设备组'))->options($deviceGroups);
             $form->multipleSelect('device_id', __('手机设备'))->options($devices);
@@ -156,11 +158,11 @@ class TaskListsController extends AdminController
             $form->divider('任务类型和参数配置');
             $form->select('task_id', __('任务类型'))->options($taskTypes)
                 ->required()
-                ->when(1, function(Form $form){
+                ->when(1, function(Form $form){// 获取账号信息
                     $form->embeds('configs', '', function ($form) {
                         $form->html('');
                         $form->html('');
-                        $form->html('<b style="color:red;">获取账号信息,执行时间和频率将失效</span>');
+                        $form->html('<b style="color:red;">获取账号信息,执行时间和频率将失效,右侧配置无效!</span>');
                         $form->html('');
                         $form->html('');
                         $form->html('');
@@ -168,7 +170,7 @@ class TaskListsController extends AdminController
                         $form->html('⬅⬅⬅⬅请在左侧选择设备, 账号无需选择, 选了无效!');
                     });
                 })
-                ->when(2, function(Form $form){
+                ->when(2, function(Form $form){// 养号
                     $form->embeds('configs', '', function ($form) {
                         $form->number('videos', '观看数量')->default(10)->help('视频数量会在设置值和设置值-10之间做随机!');
                         $form->number('seetime', '观看时长')->default(10)->help('根据设置做随机,逻辑同观看数量,单位为 秒!');
@@ -288,6 +290,12 @@ class TaskListsController extends AdminController
             $timeout        = -1;
 
             $tskType        = TaskType::find($task_id);
+            if($tskType->isone == 1){
+                $arrs   = ['type'=>$tskType->type, 'data'=>['config' => $configs, 'quality'=>$quality, 'file' => $tskType->file, 'id' => $id, 'req_time' => time()], 'code' => 200, 'msg' => '', 'noreback' => false];
+                $rs     = WbApi::send(Admin::user()->id, $form->device_id, $arrs);
+                // dd($rs);
+                return true;
+            }
             
             if($endTime){
                 $endTime    = strtotime($endTime)+86399;
@@ -339,12 +347,13 @@ class TaskListsController extends AdminController
                 'configs'       => $configs,
                 'units'         => (int)$units,
                 'frequency'     => $frequency,
-                'last'          => null,
+                'last'          => 0,
+                'type'          => $tskType->type,
             ];
             $key            = '-task_' . $id . '_' . Admin::user()->id;
 
             Redis::setex($key, $timeout, json_encode($arr));
-            dd($arr);
+            // dd($arr);
         });
         // $form->confirm('提交后无法修改,确定吗?');
         return $form;

@@ -53,7 +53,7 @@ class HomeController extends Controller
         // print_r($arr);
         $str    = json_encode($arr);
         $data   = Ens::encrypt($str);
-        echo $data;
+        // echo $data;
 
         $timeout    = date('H:i:s', strtotime('+'.env('QRCODE_TIMEOUT', 180).' seconds'));
         $result = Builder::create()

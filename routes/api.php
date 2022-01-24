@@ -55,4 +55,6 @@ Route::group([
 	Route::post('/topcaccounts', 'PublicController@topcaccounts')->name('topcaccounts');
 	Route::post('/uploaded', 'PublicController@uploaded')->name('uploaded');
 	Route::post('/start', 'PublicController@start')->name('start');
+
+	Route::post('/accounts', 'DevicesController@accounts')->name('accounts');
 });

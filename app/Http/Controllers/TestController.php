@@ -17,6 +17,9 @@ use App\Globals\Ens;
 use GuzzleHttp;
 use Nullix\CryptoJsAes\CryptoJsAes;
 
+use App\Globals\WbApi;
+use Encore\Admin\Facades\Admin;
+
 class TestController extends Controller{
     public function index(Request $request){
     	// dd(openssl_get_cipher_methods());
@@ -125,18 +128,22 @@ class TestController extends Controller{
      //    file_put_contents(__DIR__. '/2.html', $res);
      //    dd($response->getStatusCode());
 
+     // $rs         = WbApi::Send(Admin::user()->id, '11', '', 'exit');
+     // return;
 
      try {
         // $aarr   = ['type'=>'doiyinyanghao', 'data'=>['config' => ['dianzan'=> 0.2,'seetime'=> [3, 8], 'comments_probability' => 0.1, 'comments' => ['不错哦','喜欢这个视频','怎么拍的?', '挺好的'], 'videos' => [1, 3]], 'quality'=>0, 'file' => 'robot.douyin', 'id' => 1, 'req_time' => time()], 'code' => 200, 'msg' => '', 'noreback' => false];
-        $aarr   = ['type'=>'accounts', 'data'=>['config' => ['dianzan'=> 0.2,'seetime'=> [3, 8], 'comments_probability' => 0.1, 'comments' => ['不错哦','喜欢这个视频','怎么拍的?', '挺好的'], 'videos' => [1, 3]], 'quality'=>0, 'file' => 'getaccounts', 'id' => 1, 'req_time' => time()], 'code' => 200, 'msg' => '', 'noreback' => false];
-        // $aarr  = ['type'=>'stop', 'data'=>[1], 'code' => 200, 'msg' => '', 'noreback' => false];
+        // $aarr   = ['type'=>'accounts', 'data'=>['config' => ['dianzan'=> 0.2,'seetime'=> [3, 8], 'comments_probability' => 0.1, 'comments' => ['不错哦','喜欢这个视频','怎么拍的?', '挺好的'], 'videos' => [1, 3]], 'quality'=>0, 'file' => 'getaccounts', 'id' => 1, 'req_time' => time()], 'code' => 200, 'msg' => '', 'noreback' => false];// 获取账号信息
+      // $aarr   = ['type'=>'raise', 'data'=>['config' => ['dianzan'=> 0.2,'seetime'=> [3, 8], 'comments_probability' => 0.1, 'comments' => [], 'videos' => [6, 12]], 'quality'=>0, 'file' => 'getaccounts', 'id' => 1, 'req_time' => time()], 'code' => 200, 'msg' => '', 'noreback' => false];
+        // $aarr  = ['type'=>'stop', 'data'=>[11], 'code' => 200, 'msg' => '', 'noreback' => false];
+        $aarr   = ['type'=>'post', 'data'=>['config' => ['media' => 'https://ht-yk.oss-cn-hangzhou.aliyuncs.com/2022/1/21/1642751529314.mp4', 'content' => 'I think i can fly #fyp'], 'quality'=>0, 'file' => 'post', 'id' => 1, 'req_time' => time()], 'code' => 200, 'msg' => '', 'noreback' => false];
         $http = new GuzzleHttp\Client;
         $response = $http->post(env('TASK_API_URL'), [
           'form_params' => [
            'id'  => 1,
-           'did' => '1,2,4,8,9,7,10',
-              'type'   => 'zzz',
-              'data'   => json_encode($aarr),
+           'did' => '1,2,4,8,9,7,10,11',
+           'type' => 'zzzz',
+           'data'   => json_encode($aarr),
           ],
         ]);
         $res   = (string)$response->getBody();

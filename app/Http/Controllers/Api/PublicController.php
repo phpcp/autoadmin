@@ -241,7 +241,7 @@ class PublicController extends Controller{
 		return $request->file('uploadfile')->store('autouploaded');
 	}
 
-	// 像手机端发送任务
+	// 向手机端发送任务
 	public function start(Request $request){
 		// Wbapi::send();
 		$token 			= $request->input('token');
