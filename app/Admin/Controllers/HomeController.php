@@ -66,7 +66,7 @@ class HomeController extends Controller
                     ->margin(10)
                     ->roundBlockSizeMode(new RoundBlockSizeModeMargin())
                     // ->logoPath(__DIR__.'/assets/symfony.png')
-                    ->labelText('过期时间: ' . $timeout)
+                    ->labelText('过期时间: ' . $timeout . ' ID:' . Admin::user()->id)
                     ->labelFont(new NotoSans(20))
                     ->labelAlignment(new LabelAlignmentCenter())
                     ->build();

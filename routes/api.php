@@ -57,4 +57,5 @@ Route::group([
 	Route::post('/start', 'PublicController@start')->name('start');
 
 	Route::post('/accounts', 'DevicesController@accounts')->name('accounts');
+	Route::post('/getbyid/{id}', 'PublicController@getbyid')->name('getbyid')->where('id', '[0-9]+');
 });

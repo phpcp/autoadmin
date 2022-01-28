@@ -295,4 +295,42 @@ class PublicController extends Controller{
 		// 	'runtype'	=> 0,
 		// ];
 	}
+
+	// 通过adminid返回ws和token
+	public function getbyid($id, Request $request){
+		$imei 	= $request->input('imei');
+		if(!$imei){
+			return Responses::error('非法请求!', null, 500, 200);
+		}
+		$user 	= AdminUser::find($id);
+		if(!$user){
+			return Responses::error('任务发布失败!', null, 500, 200);
+		}
+		if($user->endtime && $user->endtime < time()){
+			return Responses::error('授权已过期!', null, 500, 200);
+		}
+
+		$version 	= null;
+		$lang 		= null;
+		$deviceRow 	= Device::where('admin_id', $user->id)->where('imei', $imei)->first();
+		if(!$deviceRow){
+			$deviceRow 		= Device::bind($imei, $user, [], strtolower($version), strtolower($lang));
+			if(!$deviceRow instanceof Device){
+				return Responses::error($deviceRow);
+			}
+		}else{
+			$version 	= $deviceRow->soft_version;
+			$lang 		= $deviceRow->soft_lang;
+		}
+		if(!$version || !$lang){
+			return Responses::error('请现在后台设置tk对应的版本和语言! 编号: ' . $deviceRow->user_num);
+		}
+
+		$token 		= AdminUser::token($user);
+		return Responses::success([
+			'token' 		=> $token,
+			'appversion' 	=> $version,
+			'applang'		=> $lang,
+		]);
+	}
 }
