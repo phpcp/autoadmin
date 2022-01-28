@@ -5,6 +5,7 @@ namespace App\Admin\Controllers;
 use App\Models\Task;
 use App\Models\Device;
 use App\Models\Account;
+use App\Models\AccountVideo;
 use App\Models\TaskType;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
@@ -18,6 +19,7 @@ use App\Models\AccountToGroup;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\MessageBag;
 use App\Globals\WbApi;
+use Illuminate\Support\Facades\Storage;
 
 class TaskListsController extends AdminController
 {
@@ -142,7 +144,7 @@ class TaskListsController extends AdminController
                 'on'  => ['value' => 1, 'text' => '监听', 'color' => 'primary'],
                 'off' => ['value' => 0, 'text' => '失效', 'color' => 'default'],
             ];
-            $form->text('name', __('任务名称'))->required()->rules('max:30');
+            $form->text('name', __('名称'))->required()->rules('max:30');
             $form->number('quality', __('任务权重'))->default(0)->help('数值越大,优先级越高!');
             $form->hidden('status', __('任务进度'));
             $form->number('need_times', __('执行次数'))->help('0为不限次数');
@@ -153,68 +155,9 @@ class TaskListsController extends AdminController
             $form->multipleSelect('device_id', __('手机设备'))->options($devices);
             $form->multipleSelect('ag', __('账号组'))->options($accountGroups);
             $form->multipleSelect('account_id', __('账号列表'))->options($accounts);
-        });
-        $form->column(1/3, function ($form) use($taskTypes) {
-            $form->divider('任务类型和参数配置');
-            $form->select('task_id', __('任务类型'))->options($taskTypes)
-                ->required()
-                ->when(1, function(Form $form){// 获取账号信息
-                    $form->embeds('configs', '', function ($form) {
-                        $form->html('');
-                        $form->html('');
-                        $form->html('<b style="color:red;">获取账号信息,执行时间和频率将失效,右侧配置无效!</span>');
-                        $form->html('');
-                        $form->html('');
-                        $form->html('');
-                        $form->html('');
-                        $form->html('⬅⬅⬅⬅请在左侧选择设备, 账号无需选择, 选了无效!');
-                    });
-                })
-                ->when(2, function(Form $form){// 养号
-                    $form->embeds('configs', '', function ($form) {
-                        $form->number('videos', '观看数量')->default(10)->help('视频数量会在设置值和设置值-10之间做随机!');
-                        $form->number('seetime', '观看时长')->default(10)->help('根据设置做随机,逻辑同观看数量,单位为 秒!');
-                        $form->rate('dianzan', '点赞概率')->default(10);
-                        $form->rate('comment_pro', '评论概率')->default(10);
-                    });
-                })->when(3, function(Form $form){
-                    $form->embeds('configs', '', function ($form) {
-                        $states = [
-                            'on'  => ['value' => 1, 'text' => '日常', 'color' => 'success'],
-                            'off' => ['value' => 0, 'text' => '正常', 'color' => 'info'],
-                        ];
-                        $form->textarea('content', '发布内容')->help('一行一条');
-                        $form->text('address', '发布位置')->help('抖音的发布位置');
-                        $form->switch('richang', '发布日常')->states($states);
-                        $form->multipleFile('medias', __('视频文件'))->removable()->downloadable();
-                    });
-                })->when(4, function(Form $form){ //关注用户
-                    $form->embeds('configs', '', function ($form) {
-                        $keyType    = [
-                            1   => '用户',
-                            2   => '视频',
-                            3   => '音乐',
-                            4   => 'Tag',
-                        ];
-                        $form->number('max', __('关注数量'));
-                        $form->text('key', __('关键词'))->help('搜索关键词,留空则关注自己粉丝!');
-                        $form->select('type', '搜索类型')->options($keyType)
-                        ->when(1, function(Form $form){
-                            $form->embeds('configs', '', function ($form) {
-                                $form->number('fans', '粉丝量');
-                                $form->number('videos', '视频数');
-                            });
-                        })->when(2, function(Form $form){
-                            $form->embeds('configs', '', function ($form) {
-                                $form->number('zan', '点赞量');
-                            });
-                        });
-                    });
-                });
-        });
-        $form->column(1/3, function ($form) use($taskTypes) {
+
             $form->divider('执行时间和频率选择');
-            $form->dateRange('starttime', 'endtime', __('任务时间'))->required()->help('未选开始时间任务立刻开始,未选结束时间长期有效!');
+            $form->dateRange('starttime', 'endtime', __('任务时间'))->help('未选开始时间立刻开始,未选结束时间仅执行一次!');
             $form->select('units', __('执行频率'))->options(Task::$zhouqi)
                 ->when(1, function(Form $form){
                     $form->embeds('frequency', '', function ($form) {
@@ -227,8 +170,71 @@ class TaskListsController extends AdminController
                     });
                 })->help('注意:频率太低有可能导致任务执行失败!');
         });
+        $form->column(2/3, function ($form) use($taskTypes) {
+            $form->select('task_id', __('任务类型'))->options($taskTypes)->required()
+            ->when(1, function(Form $form){// 获取账号信息
+                $form->embeds('configs', '', function ($form) {
+                    $form->html('');
+                    $form->html('');
+                    $form->html('<b style="color:red;">获取账号信息,执行时间和频率将失效,右侧配置无效!</b>');
+                    $form->html('');
+                    $form->html('');
+                    $form->html('');
+                    $form->html('');
+                    $form->html('⬅⬅⬅⬅请在左侧选择设备, 账号无需选择, 选了无效!');
+                });
+            })
+            ->when(2, function(Form $form){// 养号
+                $form->embeds('configs', '', function ($form) {
+                    $form->number('videos', '观看数量')->default(10)->help('视频数量会在设置值和设置值-10之间做随机!');
+                    $form->number('seetime', '观看时长')->default(10)->help('根据设置做随机,逻辑同观看数量,单位为 秒!');
+                    $form->rate('dianzan', '点赞概率')->default(10);
+                    $form->rate('comment_pro', '评论概率')->default(10);
+                });
+            })->when(3, function(Form $form){
+                // $form->html('<b style="color:red;">此处暂不支持视频发布,请到账号管理页面执行发布!</b>');
+                // $form->html('<b style="color:red;">此处暂不支持视频发布,请到账号管理页面执行发布!</b>');
+                // $form->embeds('videos', '', function ($form) {
+                //     $states = [
+                //         'on'  => ['value' => 1, 'text' => '日常', 'color' => 'success'],
+                //         'off' => ['value' => 0, 'text' => '正常', 'color' => 'info'],
+                //     ];
+                //     $form->textarea('content', '发布内容')->help('一行一条');
+                //     $form->text('address', '发布位置')->help('抖音的发布位置');
+                //     $form->switch('richang', '发布日常')->states($states);
+                //     $form->multipleFile('medias', __('视频文件'))->removable()->downloadable();
+                // });
+                $form->table('configs', __('视频配置'), function ($table) {
+                    $table->file('media', '视频');
+                    $table->textarea('content', '视频标题')->rows(4);
+                });
+            })->when(4, function(Form $form){ //关注用户
+                $form->embeds('configs', '', function ($form) {
+                    $keyType    = [
+                        1   => '用户',
+                        2   => '视频',
+                        3   => '音乐',
+                        4   => 'Tag',
+                    ];
+                    $form->number('max', __('关注数量'));
+                    $form->text('key', __('关键词'))->help('搜索关键词,留空则关注自己粉丝!');
+                    $form->select('type', '搜索类型')->options($keyType)
+                    ->when(1, function(Form $form){
+                        $form->embeds('configs', '', function ($form) {
+                            $form->number('fans', '粉丝量');
+                            $form->number('videos', '视频数');
+                        });
+                    })->when(2, function(Form $form){
+                        $form->embeds('configs', '', function ($form) {
+                            $form->number('zan', '点赞量');
+                        });
+                    });
+                });
+            });
+        });
+        // $form->divider('任务类型和参数配置');
 
-        $form->saving(function(Form $form){
+        $form->saving(function(Form $form) use($adminId){
             if(!$form->task_id){
                 $error = new MessageBag([
                     'title'   => '错误',
@@ -275,6 +281,27 @@ class TaskListsController extends AdminController
                     $form->account_id   = $accounts;
                 }
             }
+
+            // 处理视频
+            if($form->task_id == 3){
+                if(count($form->account_id) < 1){
+                    return false;
+                }
+                $medias     = [];
+                foreach($form->configs as $item){
+                    if(!isset($item['media'])){
+                        continue;
+                    }
+                    $path               = Storage::disk('admin')->putFile('media' . $adminId, $item['media']);
+                    if($path){
+                        $medias[]           = array_merge(['_remove_' => $item['_remove_']], ['url' => $path, 'content' => $item['content']]);
+                    }
+                }
+                if(count($medias) < 1){
+                    return false;
+                }
+                $form->configs          = $medias;
+            }
         });
         // redis 以任务id为记录
         $form->saved(function (Form $form) {
@@ -296,7 +323,7 @@ class TaskListsController extends AdminController
                 // dd($rs);
                 return true;
             }
-            
+
             if($endTime){
                 $endTime    = strtotime($endTime)+86399;
                 $tmp        = $endTime - time();
@@ -333,6 +360,26 @@ class TaskListsController extends AdminController
                 }
             }
 
+            // dd($form->model()->account_id, $configs);
+            if($form->model()->task_id == 3){
+                $vdaccounts             = $form->model()->account_id;
+                $medias                 = $configs;//json_decode($configs, true);
+                foreach($vdaccounts as $item){
+                    if(count($medias) < 1){
+                        break;
+                    }
+                    $acv                = new AccountVideo;
+                    $acv->admin_id      = $form->model()->admin_id;
+                    $acv->task_id       = $form->model()->id;
+                    $acv->account_id    = $item;
+                    $acv->url           = $medias[0]['url'];
+                    $acv->content       = $medias[0]['content'];
+                    if($acv->save()){
+                        unset($medias[0]);
+                    }
+                }
+            }
+
             $arr            = [
                 'id'            => $id,
                 'admin'         => (int)Admin::user()->id,
@@ -357,6 +404,12 @@ class TaskListsController extends AdminController
         });
         // $form->confirm('提交后无法修改,确定吗?');
         return $form;
+    }
+
+    public function accounttask($id){
+        $account        = Account::find($id);
+        $videos         = AccountVideo::where('account_id', $id)->get();
+        return view('videosend', ['list' => $videos]);
     }
 }
 

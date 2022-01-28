@@ -20,6 +20,7 @@ use Endroid\QrCode\Label\Font\NotoSans;
 use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
 use Endroid\QrCode\Writer\PngWriter;
 use App\Globals\Ens;
+use App\Admin\Actions\Account\Task;
 
 class AccountsController extends AdminController
 {
@@ -110,12 +111,15 @@ class AccountsController extends AdminController
         //     return $result->getDataUri();
         // })->image();
         $grid->column('shareUrl', __('分享链接'))->hide();
-        $grid->disableActions();
-        $grid->batchActions(function ($batch) {
-            $batch->disableDelete();
-        });
+        // $grid->disableActions();
+        // $grid->batchActions(function ($batch) {
+        //     $batch->disableDelete();
+        // });
         // $grid->column('updated_at', __('Updated at'));
         // $grid->column('created_at', __('Created at'));
+        $grid->actions(function ($actions) {
+            // $actions->add(new Task);
+        });
 
         return $grid;
     }

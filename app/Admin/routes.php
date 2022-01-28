@@ -19,5 +19,9 @@ Route::group([
     $router->resource('accounts', AccountsController::class);
     $router->resource('group-accounts', GroupAccountController::class);
     $router->resource('group-devices', GroupDevicesController::class);
-    $router->resource('tasks', TaskListsController::class);
+    // $router->resource('tasks', TaskListsController::class);
+    $router->resource('account-videos', AccountVideoController::class);
+    $router->resource('tasks', TaskController::class);
+
+    $router->get('tasks/{id}/account', 'TaskListsController@accounttask')->name('accounttask');
 });

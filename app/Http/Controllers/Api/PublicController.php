@@ -238,7 +238,7 @@ class PublicController extends Controller{
 
 	// 接收文件上传
 	public function uploaded(Request $request){
-		return $request->file('uploadfile')->store('autouploaded');
+		return $request->file('uploadfile')->store('public/autouploaded');
 	}
 
 	// 向手机端发送任务

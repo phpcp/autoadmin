@@ -91,10 +91,32 @@ class Task extends Model{
 
 	// 配置参数格式化
 	public function getConfigsAttribute($val){
-		// dd($val);
-		return $val ? json_decode($val, true) : null;
+		$arr 	=  $val ? json_decode($val, true) : null;
+		if(isset($arr) && isset($arr[0]['url'])){
+			foreach($arr as &$item){
+				$item['media']	= $item['url'];
+			}
+		}
+		return $arr;
 	}
 	public function setConfigsAttribute($val){
 		$this->attributes['configs'] 	= json_encode($val);
+	}
+
+	// 视频
+	public function getMediasAttribute($val){
+		// $arr 	=  $val ? json_decode($val, true) : null;
+		// if(isset($arr) && isset($arr[0]['url'])){
+		// 	foreach($arr as &$item){
+		// 		$item['media']	= $item['url'];
+		// 	}
+		// }
+		// return $arr;
+		return json_decode($val, true);
+	}
+	public function setMediasAttribute($val){
+		if (is_array($val)) {
+			$this->attributes['medias'] = json_encode($val);
+		}
 	}
 }
