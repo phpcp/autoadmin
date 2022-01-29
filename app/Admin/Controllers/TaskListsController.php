@@ -281,6 +281,10 @@ class TaskListsController extends AdminController
                     $form->account_id   = $accounts;
                 }
             }
+            // if($accounts){
+            //     $dids                   = Account::whereIn('id', $accounts)->pluck('did', 'did');
+            //     $form->device_id        = array_keys($dids);
+            // }
 
             // 处理视频
             if($form->task_id == 3){

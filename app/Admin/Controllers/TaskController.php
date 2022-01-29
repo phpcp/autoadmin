@@ -128,7 +128,7 @@ class TaskController extends AdminController
      */
     protected function form(){
         $form               = new Form(new Task());
-        // $form->model()->where('admin_id', Admin::user()->id);
+        $form->model()->where('admin_id', Admin::user()->id);
         $adminId            = Admin::user()->id;
         $taskTypes          = TaskType::getLists()->toArray();
         $devices            = Device::myDevices($adminId);
@@ -225,7 +225,6 @@ class TaskController extends AdminController
         });
 
         $form->saved(function (Form $form) {
-            // $aarr   = ['type'=>'raise', 'data'=>['account', 'config' => ['dianzan'=> 0.2,'seetime'=> [3, 8], 'comments_probability' => 0.1, 'comments' => [], 'videos' => [6, 12]], 'quality'=>0, 'file' => 'getaccounts', 'id' => 1, 'req_time' => time()], 'code' => 200, 'msg' => '', 'noreback' => false];
             if($form->task_id){
                 $tskType                    = TaskType::find($form->task_id);
                 $data   = [
@@ -248,84 +247,108 @@ class TaskController extends AdminController
                 }else{
                     $devicesId      = $form->model()->device_id;
                 }
-                if($form->task_id == 3){
-                    if(empty($form->model()->medias)){
-                        $error = new MessageBag([
-                            'title'   => '错误',
-                            'message' => '请上传视频!',
-                        ]);
-                        return back()->with(compact('error'));
-                    }
-                    $medias         = $form->model()->medias;
-                    $commants       = explode("\r\n", $form->model()->commant);
-                    $accountObj     = Account::whereIn('id', $form->model()->account_id)->get()->toArray();
-                    if(empty($accountObj)){
-                        $error = new MessageBag([
-                            'title'   => '错误',
-                            'message' => '找不到发布账号!',
-                        ]);
-                        return back()->with(compact('error'));
-                    }
-                    $acarr          = [];
-                    $i              = 0;
-                    // $ml             = count($medias);
-                    // $al             = count($accountObj);
-                    foreach($medias as $index => $media){
-                        if(!isset($accountObj[$i])){
-                            $i      = 0;
-                        }
-                        $acr        = $accountObj[$i];
 
-                        $acarr[$acr['did']][]      = [
-                            'uuid'      => $acr['uuid'],
-                            'media'     => Storage::disk('admin')->url($media),
-                            'commant'   => $commants[$index] ?? null,
-                        ];
-                        $i++;
-                    }
-                    $sendarr        = [];
-                    foreach ($acarr as $key => $value) {
-                        foreach($value as $k => $item){
-                            $sendarr[$key][$item['uuid']][]     = [
-                                'media'     => $item['media'],
-                                'commant'   => $item['commant'],
-                            ];
-                        }
-                        
-                    }
-                    // foreach($accountObj as $item){
-                    //     if(!isset($medias[0])){
-                    //         break;
-                    //     }
-                    //     if(!isset($acarr[$item->did])){
-                    //         $acarr[$item->did]              = [];
-                    //     }
-                    //     $acarr[$item->did][$item->uuid]      = [
-                    //         'media'     => Storage::disk('admin')->url($medias[0]),
-                    //         'commant'   => $commants[0] ?? null,
-                    //     ];
-                    //     unset($medias[0]);
-                    //     $medias         = array_values($medias);
-                    //     if(isset($commants[0])){
-                    //         unset($commants[0]);
-                    //         $commants   = array_values($commants);
-                    //     }
-                    // }
-                    // print_r($medias);
-                    // dd($sendarr);
-                    $arr['data']['configs'] = $sendarr;
-                    $rs     = WbApi::send(Admin::user()->id, null, $arr);
-                    $rs     = json_decode($rs, true);
-                    if($rs['code'] != 200){
+                if(!$tskType){
+                    $error = new MessageBag([
+                        'title'   => '错误',
+                        'message' => '请选择任务类型!',
+                    ]);
+                    return back()->with(compact('error'));
+                }
+                // 除了基于设备的任务,其余的都是基于账号的任务
+                if($tskType->isdevice != 1){
+                    if(!$accountsId){
                         $error = new MessageBag([
                             'title'   => '错误',
-                            'message' => $rs['msg'],
+                            'message' => '当前任务设置没有账号!',
+                        ]);
+                        return back()->with(compact('error'));
+                    }
+                }
+
+
+                // 将配置按设备区分,并带上账号信息
+                $acarr          = [];
+                $accountObj     = Account::whereIn('id', $form->model()->account_id)->get()->toArray();
+                if($tskType->model){// 有内置方法
+                    $rs         = call_user_func_array(['App\Models\TaskType', $tskType->model], [$form, $arr]);
+                    if($rs !== true){
+                        $error = new MessageBag([
+                            'title'   => '错误',
+                            'message' => $rs,
                         ]);
                         return back()->with(compact('error'));
                     }
                 }else{
                     $rs     = WbApi::send(Admin::user()->id, implode(',', $devicesId), $arr);
+                    $rs     = json_decode($rs, true);
+                    if($rs['code'] != 200){
+                         $error = new MessageBag([
+                            'title'   => '错误',
+                            'message' => $rs['msg'],
+                        ]);
+                        return back()->with(compact('error'));
+                    }
                 }
+
+
+
+                // if($form->task_id == 3){
+                //     if(empty($form->model()->medias)){
+                //         $error = new MessageBag([
+                //             'title'   => '错误',
+                //             'message' => '请上传视频!',
+                //         ]);
+                //         return back()->with(compact('error'));
+                //     }
+                //     $medias         = $form->model()->medias;
+                //     $commants       = explode("\r\n", $form->model()->commant);
+                //     if(empty($accountObj)){
+                //         $error = new MessageBag([
+                //             'title'   => '错误',
+                //             'message' => '找不到发布账号!',
+                //         ]);
+                //         return back()->with(compact('error'));
+                //     }
+                //     $acarr          = [];
+                //     $i              = 0;
+                //     foreach($medias as $index => $media){
+                //         if(!isset($accountObj[$i])){
+                //             $i      = 0;
+                //         }
+                //         $acr        = $accountObj[$i];
+
+                //         $acarr[$acr['did']][]      = [
+                //             'uuid'      => $acr['uuid'],
+                //             'media'     => Storage::disk('admin')->url($media),
+                //             'commant'   => $commants[$index] ?? null,
+                //         ];
+                //         $i++;
+                //     }
+                //     $sendarr        = [];
+                //     foreach ($acarr as $key => $value) {
+                //         foreach($value as $k => $item){
+                //             $sendarr[$key][$item['uuid']][]     = [
+                //                 'media'     => $item['media'],
+                //                 'commant'   => $item['commant'],
+                //             ];
+                //         }
+                        
+                //     }
+                //     $arr['data']['configs'] = $sendarr;
+                //     $rs     = WbApi::send(Admin::user()->id, null, $arr);
+                //     $rs     = json_decode($rs, true);
+                //     if($rs['code'] != 200){
+                //         $error = new MessageBag([
+                //             'title'   => '错误',
+                //             'message' => $rs['msg'],
+                //         ]);
+                //         return back()->with(compact('error'));
+                //     }
+                // }else{
+                //     // dd($devicesId, $arr);
+                //     $rs     = WbApi::send(Admin::user()->id, implode(',', $devicesId), $arr);
+                // }
             }
         });
         // $form->number('admin_id', __('Admin id'));
