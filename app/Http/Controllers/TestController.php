@@ -19,6 +19,7 @@ use Nullix\CryptoJsAes\CryptoJsAes;
 
 use App\Globals\WbApi;
 use Encore\Admin\Facades\Admin;
+use Illuminate\Support\Facades\Storage;
 
 class TestController extends Controller{
     public function index(Request $request){
@@ -134,7 +135,7 @@ class TestController extends Controller{
      try {
         // $aarr   = ['type'=>'doiyinyanghao', 'data'=>['config' => ['dianzan'=> 0.2,'seetime'=> [3, 8], 'comments_probability' => 0.1, 'comments' => ['不错哦','喜欢这个视频','怎么拍的?', '挺好的'], 'videos' => [1, 3]], 'quality'=>0, 'file' => 'robot.douyin', 'id' => 1, 'req_time' => time()], 'code' => 200, 'msg' => '', 'noreback' => false];
         // $aarr   = ['type'=>'accounts', 'data'=>['config' => ['dianzan'=> 0.2,'seetime'=> [3, 8], 'comments_probability' => 0.1, 'comments' => ['不错哦','喜欢这个视频','怎么拍的?', '挺好的'], 'videos' => [1, 3]], 'quality'=>0, 'file' => 'getaccounts', 'id' => 1, 'req_time' => time()], 'code' => 200, 'msg' => '', 'noreback' => false];// 获取账号信息
-      $aarr   = ['type'=>'raise', 'data'=>['config' => ['dianzan'=> 0.2,'seetime'=> [3, 8], 'comments_probability' => 0.1, 'comments' => [], 'videos' => [6, 12]], 'quality'=>0, 'file' => 'getaccounts', 'id' => 1, 'req_time' => time()], 'code' => 200, 'msg' => '', 'noreback' => false];
+      $aarr   = ['type'=>'raise', 'data'=>['account', 'config' => ['dianzan'=> 0.2,'seetime'=> [3, 8], 'comments_probability' => 0.1, 'comments' => [], 'videos' => [6, 12]], 'quality'=>0, 'file' => 'getaccounts', 'id' => 1, 'req_time' => time()], 'code' => 200, 'msg' => '', 'noreback' => false];
         // $aarr  = ['type'=>'stop', 'data'=>[11], 'code' => 200, 'msg' => '', 'noreback' => false];
         // $aarr   = ['type'=>'post', 'data'=>['config' => ['media' => 'https://ht-yk.oss-cn-hangzhou.aliyuncs.com/2022/1/21/1642751529314.mp4', 'content' => 'I think i can fly #fyp'], 'quality'=>0, 'file' => 'post', 'id' => 1, 'req_time' => time()], 'code' => 200, 'msg' => '', 'noreback' => false];
         $http = new GuzzleHttp\Client;
@@ -174,6 +175,11 @@ class TestController extends Controller{
         $res    = (string)$response->getBody();
         // file_put_contents(__DIR__. '/2.html', $res);
         dd($res);
+    }
+
+    // 获取资源下载二维码
+    public function resours(){
+      return '<div style="text-align:center;"><img src="' . Storage::url('images/domeapk.png') . '" style="max-width:90%;"> <div>脚本软件下载</div> <br><br> <img src=""></div>';
     }
 }
 

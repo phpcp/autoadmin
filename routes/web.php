@@ -20,4 +20,5 @@ Route::get('/', function () {
 });
 
 Route::get('/qrcode', [TestController::class, 'index']);
+Route::get('/resours', [TestController::class, 'resours'])->name('resours');
 Route::get('/test', [TestController::class, 'test']);

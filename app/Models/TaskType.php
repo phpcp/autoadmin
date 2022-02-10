@@ -17,18 +17,18 @@ class TaskType extends Model{
     }
 
     // 发布视频格式化配置参数
-    public static function videos(Form $form, $arr){
-    	if(empty($form->model()->medias)){
+    public static function videos(Model $model, $arr){
+    	if(empty($model->medias)){
     		return '请上传视频!';
     	}
     	$acarr          = [];
-        $accountObj     = Account::whereIn('id', $form->model()->account_id)->get()->toArray();
+        $accountObj     = Account::whereIn('id', $model->account_id)->get()->toArray();
         if(empty($accountObj)){
             return '找不到发布账号!';
         }
 
-    	$medias         = $form->model()->medias;
-        $commants       = explode("\r\n", $form->model()->commant);
+    	$medias         = $model->medias;
+        $commants       = explode("\r\n", $model->commant);
 
         $acarr          = [];
         $i              = 0;
@@ -64,12 +64,12 @@ class TaskType extends Model{
     }
 
     // 养号
-    public static function raise(Form $form, $arr){
-    	if(!$form->model()->account_id){
+    public static function raise(Model $model, $arr){
+    	if(!$model->account_id){
     		return '请设置账号!';
     	}
 
-    	$accountObj     = Account::where('admin_id', Admin::user()->id)->whereIn('id', $form->model()->account_id)->get()->toArray();
+    	$accountObj     = Account::where('admin_id', Admin::user()->id)->whereIn('id', $model->account_id)->get()->toArray();
     	if(!$accountObj){
     		return '未发现账号!';
     	}
@@ -83,10 +83,14 @@ class TaskType extends Model{
     	foreach($sendArr as $did => $item){
     		$arr['data']['accounts'] 	= array_values($item);
     		$rs     = WbApi::send(Admin::user()->id, $did, $arr);
-    		$rs     = json_decode($rs, true);
-	        if($rs['code'] != 200){
-	            $msg[] 	= $rs['msg'];
-	        }
+            if($rs != null){
+        		$rs     = json_decode($rs, true);
+    	        if($rs['code'] != 200){
+    	            $msg[] 	= $rs['msg'];
+    	        }
+            }else{
+                return 'ws未启动...';
+            }
     	}
     	if($msg){
     		return implode('<br>', $msg);

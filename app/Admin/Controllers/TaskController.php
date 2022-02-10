@@ -21,6 +21,8 @@ use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\MessageBag;
 use App\Globals\WbApi;
 use Illuminate\Support\Facades\Storage;
+use App\Admin\Actions\Task\Send;
+use App\Admin\Actions\Task\Period;
 
 
 class TaskController extends AdminController
@@ -72,7 +74,7 @@ class TaskController extends AdminController
         // $grid->column('endtime', __('结束时间'))->sortable();
         $grid->column('configs', __('配置'))->hide();
         $grid->column('errmsg', __('错误信息'))->hide();
-        $grid->column('status', __('任务状态'))->using(Task::$status)->label($labels);
+        // $grid->column('status', __('任务状态'))->using(Task::$status)->label($labels);
         // $grid->column('active', __('是否有效'))->switch($states);
         $grid->column('created_at', __('创建时间'))->display(function($val){
             return date('Y-m-d H:i:s', strtotime($val));
@@ -82,6 +84,11 @@ class TaskController extends AdminController
         })->hide();
 
         $grid->disableExport();
+
+        $grid->actions(function ($actions) {
+            $actions->add(new Period);
+            $actions->add(new Send);
+        });
         // $grid->disableActions();
         return $grid;
     }
@@ -224,133 +231,74 @@ class TaskController extends AdminController
             }
         });
 
-        $form->saved(function (Form $form) {
-            if($form->task_id){
-                $tskType                    = TaskType::find($form->task_id);
-                $data   = [
-                    'configs'   => $form->configs,
-                    'quality'   => $form->quality,
-                    'file'      => $tskType->file,
-                    'id'        => $form->model()->id,
-                    'req_time'  => time(),
-                ];
-                $arr    = [
-                    'type'      => $tskType->type,
-                    'data'      => $data,
-                    'code'      => 200,
-                    'msg'       => '',
-                    'noreback'  => false,
-                ];
-                $accountsId         = array_filter($form->model()->account_id);
-                if($accountsId){
-                    $devicesId      = Account::whereIn('id', $accountsId)->pluck('did', 'did')->toArray();
-                }else{
-                    $devicesId      = $form->model()->device_id;
-                }
+        // $form->saved(function (Form $form) {
+        //     if($form->task_id){
+        //         $tskType                    = TaskType::find($form->task_id);
+        //         $data   = [
+        //             'configs'   => $form->configs,
+        //             'quality'   => $form->quality,
+        //             'file'      => $tskType->file,
+        //             'id'        => $form->model()->id,
+        //             'req_time'  => time(),
+        //         ];
+        //         $arr    = [
+        //             'type'      => $tskType->type,
+        //             'data'      => $data,
+        //             'code'      => 200,
+        //             'msg'       => '',
+        //             'noreback'  => false,
+        //         ];
+        //         $accountsId         = array_filter($form->model()->account_id);
+        //         if($accountsId){
+        //             $devicesId      = Account::whereIn('id', $accountsId)->pluck('did', 'did')->toArray();
+        //         }else{
+        //             $devicesId      = $form->model()->device_id;
+        //         }
 
-                if(!$tskType){
-                    $error = new MessageBag([
-                        'title'   => '错误',
-                        'message' => '请选择任务类型!',
-                    ]);
-                    return back()->with(compact('error'));
-                }
-                // 除了基于设备的任务,其余的都是基于账号的任务
-                if($tskType->isdevice != 1){
-                    if(!$accountsId){
-                        $error = new MessageBag([
-                            'title'   => '错误',
-                            'message' => '当前任务设置没有账号!',
-                        ]);
-                        return back()->with(compact('error'));
-                    }
-                }
-
-
-                // 将配置按设备区分,并带上账号信息
-                $acarr          = [];
-                $accountObj     = Account::whereIn('id', $form->model()->account_id)->get()->toArray();
-                if($tskType->model){// 有内置方法
-                    $rs         = call_user_func_array(['App\Models\TaskType', $tskType->model], [$form, $arr]);
-                    if($rs !== true){
-                        $error = new MessageBag([
-                            'title'   => '错误',
-                            'message' => $rs,
-                        ]);
-                        return back()->with(compact('error'));
-                    }
-                }else{
-                    $rs     = WbApi::send(Admin::user()->id, implode(',', $devicesId), $arr);
-                    $rs     = json_decode($rs, true);
-                    if($rs['code'] != 200){
-                         $error = new MessageBag([
-                            'title'   => '错误',
-                            'message' => $rs['msg'],
-                        ]);
-                        return back()->with(compact('error'));
-                    }
-                }
+        //         if(!$tskType){
+        //             $error = new MessageBag([
+        //                 'title'   => '错误',
+        //                 'message' => '请选择任务类型!',
+        //             ]);
+        //             return back()->with(compact('error'));
+        //         }
+        //         // 除了基于设备的任务,其余的都是基于账号的任务
+        //         if($tskType->isdevice != 1){
+        //             if(!$accountsId){
+        //                 $error = new MessageBag([
+        //                     'title'   => '错误',
+        //                     'message' => '当前任务设置没有账号!',
+        //                 ]);
+        //                 return back()->with(compact('error'));
+        //             }
+        //         }
 
 
-
-                // if($form->task_id == 3){
-                //     if(empty($form->model()->medias)){
-                //         $error = new MessageBag([
-                //             'title'   => '错误',
-                //             'message' => '请上传视频!',
-                //         ]);
-                //         return back()->with(compact('error'));
-                //     }
-                //     $medias         = $form->model()->medias;
-                //     $commants       = explode("\r\n", $form->model()->commant);
-                //     if(empty($accountObj)){
-                //         $error = new MessageBag([
-                //             'title'   => '错误',
-                //             'message' => '找不到发布账号!',
-                //         ]);
-                //         return back()->with(compact('error'));
-                //     }
-                //     $acarr          = [];
-                //     $i              = 0;
-                //     foreach($medias as $index => $media){
-                //         if(!isset($accountObj[$i])){
-                //             $i      = 0;
-                //         }
-                //         $acr        = $accountObj[$i];
-
-                //         $acarr[$acr['did']][]      = [
-                //             'uuid'      => $acr['uuid'],
-                //             'media'     => Storage::disk('admin')->url($media),
-                //             'commant'   => $commants[$index] ?? null,
-                //         ];
-                //         $i++;
-                //     }
-                //     $sendarr        = [];
-                //     foreach ($acarr as $key => $value) {
-                //         foreach($value as $k => $item){
-                //             $sendarr[$key][$item['uuid']][]     = [
-                //                 'media'     => $item['media'],
-                //                 'commant'   => $item['commant'],
-                //             ];
-                //         }
-                        
-                //     }
-                //     $arr['data']['configs'] = $sendarr;
-                //     $rs     = WbApi::send(Admin::user()->id, null, $arr);
-                //     $rs     = json_decode($rs, true);
-                //     if($rs['code'] != 200){
-                //         $error = new MessageBag([
-                //             'title'   => '错误',
-                //             'message' => $rs['msg'],
-                //         ]);
-                //         return back()->with(compact('error'));
-                //     }
-                // }else{
-                //     // dd($devicesId, $arr);
-                //     $rs     = WbApi::send(Admin::user()->id, implode(',', $devicesId), $arr);
-                // }
-            }
-        });
+        //         // 将配置按设备区分,并带上账号信息
+        //         $acarr          = [];
+        //         $accountObj     = Account::whereIn('id', $form->model()->account_id)->get()->toArray();
+        //         if($tskType->model){// 有内置方法
+        //             $rs         = call_user_func_array(['App\Models\TaskType', $tskType->model], [$form, $arr]);
+        //             if($rs !== true){
+        //                 $error = new MessageBag([
+        //                     'title'   => '错误',
+        //                     'message' => $rs,
+        //                 ]);
+        //                 return back()->with(compact('error'));
+        //             }
+        //         }else{
+        //             $rs     = WbApi::send(Admin::user()->id, implode(',', $devicesId), $arr);
+        //             $rs     = json_decode($rs, true);
+        //             if($rs['code'] != 200){
+        //                  $error = new MessageBag([
+        //                     'title'   => '错误',
+        //                     'message' => $rs['msg'],
+        //                 ]);
+        //                 return back()->with(compact('error'));
+        //             }
+        //         }
+        //     }
+        // });
         // $form->number('admin_id', __('Admin id'));
         // $form->number('task_id', __('Task id'));
         // $form->text('name', __('Name'));
