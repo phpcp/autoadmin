@@ -164,8 +164,11 @@ class TaskController extends AdminController
             $form->multipleSelect('account_id', __('账号列表'))->options($accounts);
 
             $form->embeds('configs', '', function ($form) use($devices, $accounts, $deviceGroups, $accountGroups){
-                $form->number('videos', '观看数量')->default(10)->help('视频数量会在设置值和设置值-10之间做随机!');
-                $form->number('seetime', '观看时长')->default(10)->help('根据设置做随机,逻辑同观看数量,单位为 秒!');
+                $form->number('minvideo', '最少视频')->default(3);
+                $form->number('maxvideo', '最多视频')->default(10);
+                $form->number('minseetime', '最短时长')->default(3);
+                $form->number('maxseetime', '最多时长')->default(10);
+
                 $form->rate('dianzan', '点赞概率')->default(10);
                 $form->rate('comment_pro', '评论概率')->default(10);
                 $form->textarea('commants', __('评论内容'))->placeholder('一行一个,随机选取!')->rows(14);
