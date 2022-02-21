@@ -65,8 +65,9 @@ class TaskController extends AdminController
 
         $grid->column('id', __('Id'))->hide();
         // $grid->column('admin_id', __('Admin id'));
-        $grid->column('task_id', __('任务类型'))->using($task_types)->filter($task_types);
+        // $grid->column('name', __('任务名称'))->filter();
         $grid->column('name', __('任务名称'))->filter()->editable()->copyable();
+        $grid->column('task_id', __('任务类型'))->using($task_types)->filter($task_types);
         $grid->column('device_id', __('设备号'))->checkbox($devices)->filter($devices);
         $grid->column('account_id', __('账号'))->checkbox($accounts)->filter($accounts);
         // $grid->column('quality', __('权重'))->sortable()->editable();

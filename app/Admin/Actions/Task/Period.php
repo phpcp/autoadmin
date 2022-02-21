@@ -14,14 +14,16 @@ class Period extends RowAction
     }
 
     public function form(){
-	    $type = [
-	        1 => '广告',
-	        2 => '违法',
-	        3 => '钓鱼',
-	    ];
+	    // $type = [
+	    //     1 => '广告',
+	    //     2 => '违法',
+	    //     3 => '钓鱼',
+	    // ];
 
-	    $this->checkbox('type', '类型')->options($type);
-	    $this->textarea('reason', '原因')->rules('required');
+	    $this->datetime('starttime', '开始时间');
+	    $this->datetime('endtime', '结束时间');
+	    // $this->checkbox('type', '类型')->options($type);
+	    // $this->textarea('reason', '原因')->rules('required');
 	}
 
 }

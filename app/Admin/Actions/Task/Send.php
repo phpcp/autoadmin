@@ -14,6 +14,9 @@ use Encore\Admin\Facades\Admin;
 class Send extends RowAction
 {
     public $name = '启动';
+    public function dialog(){
+        $this->confirm('确定启动任务?');
+    }
 
     public function handle(Model $form){
         if($form->task_id){
@@ -79,7 +82,7 @@ class Send extends RowAction
 	                	return $this->response()->error($rs['msg'])->refresh();
 	                }
 	            }else{
-	            	return $this->response()->error('ws未启动...')->refresh();
+	            	return $this->response()->error('服务未启动...')->refresh();
 	            }
             }
         }else{
