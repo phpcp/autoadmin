@@ -59,8 +59,6 @@ class Send extends RowAction
                     return back()->with(compact('error'));
                 }
             }
-
-
             // 将配置按设备区分,并带上账号信息
             $acarr          = [];
             $accountObj     = Account::whereIn('id', $form->account_id)->get()->toArray();

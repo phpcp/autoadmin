@@ -4,26 +4,23 @@ namespace App\Admin\Actions\Task;
 
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Http\Request;
 class Period extends RowAction
 {
     public $name = '周期设置';
-
-    public function handle(Model $model){
-        return $this->response()->success('周期性设置还在开发中')->refresh();
+    public function href()
+    {
+    	// $getRow = $this->getRow()->toArray();
+    	return "/admin/cycle?t_id=".$this->getKey();
     }
-
-    public function form(){
-	    // $type = [
-	    //     1 => '广告',
-	    //     2 => '违法',
-	    //     3 => '钓鱼',
-	    // ];
-
-	    $this->datetime('starttime', '开始时间');
-	    $this->datetime('endtime', '结束时间');
-	    // $this->checkbox('type', '类型')->options($type);
-	    // $this->textarea('reason', '原因')->rules('required');
-	}
-
+    // public function handle(Model $model, Request $request){
+        // return $this->response()->success('周期性设置还在开发中')->refresh();
+    // }
+ //    public function form(Model $model){
+    	
+	// 	return view('task.add')
+ //        ->with('title','周期设置')->render();
+	//     $this->date('starttime', '开始时间')->value($model->starttime);
+	//     $this->date('endtime', '结束时间')->value($model->endtime);
+	// }
 }

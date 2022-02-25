@@ -119,8 +119,11 @@ class AccountsController extends AdminController
         // $grid->column('created_at', __('Created at'));
         $grid->actions(function ($actions) {
             // $actions->add(new Task);
+            // 去掉编辑
+            $actions->disableEdit();
+            // 去掉查看
+            $actions->disableView();
         });
-
         return $grid;
     }
 // Angelia19970526
