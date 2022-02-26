@@ -78,6 +78,9 @@ class TaskController extends AdminController
         $grid->column('errmsg', __('错误信息'))->hide();
         // $grid->column('status', __('任务状态'))->using(Task::$status)->label($labels);
         // $grid->column('active', __('是否有效'))->switch($states);
+        $grid->column('media_num', __('单次视频发布数量'))->display(function ($media_num) {
+            return $media_num == 0?'---':$media_num;
+        });
         $grid->column('created_at', __('创建时间'))->display(function($val){
             return date('Y-m-d H:i:s', strtotime($val));
         });
@@ -176,11 +179,11 @@ class TaskController extends AdminController
                 $form->textarea('commants', __('评论内容'))->placeholder('一行一个,随机选取!')->rows(14);
             });
         })->when(3, function(Form $form) use($devices, $accounts, $deviceGroups, $accountGroups){// 视频发布
+            $form->number('media_num', __('单次发布数量'))->min(1)->default(1);
             $form->multipleSelect('dg', __('设备组'))->options($deviceGroups);
             $form->multipleSelect('device_id', __('手机设备'))->options($devices);
             $form->multipleSelect('ag', __('账号组'))->options($accountGroups);
             $form->multipleSelect('account_id', __('账号列表'))->options($accounts);
-
             $form->multipleFile('medias', __('视频'))->removable()->sortable();
             $form->textarea('commant', __('视频标题'))->placeholder('和视频顺序对应,如果不需要文案,则留空行')->rows(14);
         })->when(4, function(Form $form){// 关注
@@ -447,6 +450,7 @@ class TaskController extends AdminController
             case '1':
                 $TaskRedis = Redis::get('Task');
                 $TaskRedisArray = [];
+
                 if( !empty( $TaskRedis )){
                     //删除相关ID
                     $TaskRedisArray = json_decode($TaskRedis,true);
@@ -457,12 +461,13 @@ class TaskController extends AdminController
                     }
                 }
                 $Task = Task::find($data);
-
                 $admin = Admin::user()->id;
                 $TaskText = $this->addRedis($Task,$admin);
+                // dd(json_encode($TaskText));
                 if( $TaskText ){
                     array_push($TaskRedisArray, $TaskText);
                 }
+
                 Redis::set('Task',json_encode($TaskRedisArray));
             break;
             case '2': 
@@ -552,6 +557,10 @@ class TaskController extends AdminController
                     $accountObj = Account::whereIn('id', $Task->account_id)->get()->toArray();
                     if(!empty($accountObj)){
                         $medias = $Task->medias;
+                        if( $Task->media_num != 0 ){
+                            $media_num = $Task->media_num * count($accountObj);
+                            $medias = array_slice($medias,0,$media_num);
+                        }
                         $commants = explode("\r\n", $Task->commant);
                         $acarr = [];
                         $i = 0;
