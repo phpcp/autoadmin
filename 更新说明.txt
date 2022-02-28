@@ -1,0 +1,24 @@
+
+1/ .env 文件 添加  
+	REDIS_CLIENT=predis
+
+2/ 宝塔添加计划任务
+	每天  23点59分 执行
+	Shell脚本 win：php D:/wwwroot/autoadmin/artisan schedule:run
+		Linux：php /www/wwwroot/autoadmin/artisan schedule:run   （未测试）
+
+3/ 修改数据表   tasks
+	增加字段： 	字段名称：media_num	类型：int(11)		默认：0  不为空	备注：每次视频发布数量
+
+4/ 增加数据表	task_logs	任务日志
+	字段名称		类型		默认		是否为空		备注
+	id			int(11)				NO			ID 自增
+	t_id			int(11)				NO			关联任务表的ID
+	admin_id		int(11)				NO			管理员表的ID
+	status			tinyint		0		NO			任务状态
+	log			text				NO			日志
+	start_time		int(11)				NO			开始时间
+	end_time		int(11)				NO			结束时间
+	task_start		int(11)							任务开始时间
+	task_end		int(11)							任务结束时间					
+		

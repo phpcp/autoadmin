@@ -71,7 +71,7 @@ class Task extends Model{
 
 	// 开始时间格式化
 	public function getStarttimeAttribute($val){
-		return $val ? date('Y-m-d H:i:s', $val) : null;
+		return $val ? date('Y-m-d', $val) : null;
 	}
 	public function setStarttimeAttribute($val){
 		if($val){
@@ -81,7 +81,7 @@ class Task extends Model{
 
 	// 结束时间格式化
 	public function getEndtimeAttribute($val){
-		return $val ? date('Y-m-d H:i:s', $val) : null;
+		return $val ? date('Y-m-d', $val) : null;
 	}
 	public function setEndtimeAttribute($val){
 		if($val){
@@ -119,4 +119,14 @@ class Task extends Model{
 			$this->attributes['medias'] = json_encode($val);
 		}
 	}
+
+	public function getTimeFrameAttribute($value)
+    {
+        return array_values(json_decode($value, true) ?: []);
+    }
+
+    public function setTimeFrameAttribute($value)
+    {
+        $this->attributes['time_frame'] = json_encode(array_values($value));
+    }
 }

@@ -23,5 +23,6 @@ Route::group([
     $router->resource('account-videos', AccountVideoController::class);
     $router->resource('tasks', TaskController::class);
 
+    $router->any('/cycle', 'TaskController@cycle')->name('cycle');
     $router->get('tasks/{id}/account', 'TaskListsController@accounttask')->name('accounttask');
 });
