@@ -344,7 +344,6 @@ class TaskController extends AdminController
             if( !$Task ){
                 return redirect('/admin/tasks');
             }
-
             $content->header('周期设置'); 
             $content->description($Task->name); 
             $form = new Form(new Task());
@@ -352,8 +351,10 @@ class TaskController extends AdminController
             $form->date('endtime', __('结束时间'))->required()->style('width','100%')->value($Task->endtime);
 
             $form->table('time_frame', __('时间范围'), function ($table) {
-                $table->timeRange('start', 'end', '时间范围')->rules('required');
+                $table->time('start','时间选择')->rules('required');
+                // $table->timeRange('start', 'end', '时间范围')
             })->value($Task->time_frame);
+
             $form->hidden('t_id')->value($id);
             $form->setAction('cycle');          
             $form->footer(function ($footer) {
@@ -374,65 +375,40 @@ class TaskController extends AdminController
             if( empty($data['time_frame']) ){
                 $error = new MessageBag([
                     'title'   => '错误~',
-                    'message' => '时间范围不能为空!',
+                    'message' => '时间不能为空!',
                 ]);
                 return back()->with(compact('error')); 
             }
             $starttime = $data['starttime'];
             $endtime = $data['endtime'];
-            $dateBDate = $this->dateBDate($starttime,$endtime);
-            if( $dateBDate ){
+            if (strtotime($starttime.' 00:00:00') > strtotime($endtime.' 23:59:59')) {
                 $error = new MessageBag([
                     'title'   => '错误~',
                     'message' => '结束时间 不能大于 开始时间!',
                 ]);
                 return back()->with(compact('error')); 
             }
+
             $time = date('Y-m-d',time());
-            $timeDateBDate = $this->dateBDate($time,$endtime);
-            if( $timeDateBDate ){
+            if (strtotime($time.' 00:00:00') > strtotime($endtime.' 23:59:59')) {
                 $error = new MessageBag([
                     'title'   => '错误~',
                     'message' => '结束时间 不能小于 当前时间！》》》'.$time,
                 ]);
                 return back()->with(compact('error')); 
             }
+
             $time_frame = $data['time_frame'];
             $timeFrameData = $this->dataGroup($time_frame,'_remove_');
             if( empty($timeFrameData[0])){
                 $error = new MessageBag([
                     'title'   => '错误~',
-                    'message' => '时间范围不能为空!',
+                    'message' => '时间不能为空!',
                 ]);
                 return back()->with(compact('error')); 
             }
             $trueTime = $timeFrameData[0];
-            $is = true;
-            
-            foreach ($trueTime as $key => $value) {
-                $trueTime[$key]['start'] = $time.' '.$value['start'];
-                $trueTime[$key]['end'] = $time.' '.$value['end'];
-                $start = strtotime($trueTime[$key]['start']);
-                $end = strtotime($trueTime[$key]['end']);
-                if( $start >= $end ){
-                    $is = false;
-                }
-            }
-            if( $is === false ){
-                $error = new MessageBag([
-                    'title'   => '错误~',
-                    'message' => '时间范围结束不能大于或等于时间范围开始!',
-                ]);
-                return back()->with(compact('error')); 
-            }
-            $is_time_cross = $this->is_time_cross($trueTime);
-            if( $is_time_cross == true ){
-                $error = new MessageBag([
-                    'title'   => '错误~',
-                    'message' => '时间范围不能重合!',
-                ]);
-                return back()->with(compact('error')); 
-            }
+
             $id = $data['t_id'];
             $Task = Task::find($id);
             $Task->starttime = $data['starttime'];
@@ -450,7 +426,6 @@ class TaskController extends AdminController
             case '1':
                 $TaskRedis = Redis::get('Task');
                 $TaskRedisArray = [];
-
                 if( !empty( $TaskRedis )){
                     //删除相关ID
                     $TaskRedisArray = json_decode($TaskRedis,true);
@@ -463,17 +438,15 @@ class TaskController extends AdminController
                 $Task = Task::find($data);
                 $admin = Admin::user()->id;
                 $TaskText = $this->addRedis($Task,$admin);
-                // dd(json_encode($TaskText));
                 if( $TaskText ){
                     array_push($TaskRedisArray, $TaskText);
                 }
-
+                if( !empty($TaskRedisArray)){
+                    $TaskRedisArray = array_merge($TaskRedisArray);
+                }
                 Redis::set('Task',json_encode($TaskRedisArray));
             break;
             case '2': 
-                // dd(Redis::get('Task'));
-                // $TaskRedis = Redis::get('Task');
-                // dd($TaskRedis);
                 $TaskRedisArray = [];
                 $Task = Task::get();
                 foreach ($Task as $key => $value) {
@@ -483,11 +456,10 @@ class TaskController extends AdminController
                         array_push($TaskRedisArray, $TaskText);
                     }
                 }
+                if( !empty($TaskRedisArray)){
+                    $TaskRedisArray = array_merge($TaskRedisArray);
+                }
                 Redis::set('Task',json_encode($TaskRedisArray));
-
-                // $path = public_path().'\config\web.log';
-                // $str= date('Y-m-d H:i:s',time())."\n"; 
-                // file_put_contents($path,$str,FILE_APPEND);
             break;
             default:
                 # code...
@@ -505,42 +477,37 @@ class TaskController extends AdminController
                     $tskType = TaskType::find($Task->task_id);
                     if( $tskType ){
                         foreach ($Task->time_frame as $key => $value){
-                            $timeBegin = strtotime($value['start']);
-                            $timeEnd = strtotime($value['end']);
-                            if($time >=$timeBegin && $time <= $timeEnd){
-                                $accountsId = array_filter($Task->account_id);
-                                if($accountsId){
-                                    $devicesId = Account::whereIn('id', $accountsId)->pluck('did', 'did')->toArray();
-                                }else{
-                                    $devicesId = $Task->device_id;
+                            $accountsId = array_filter($Task->account_id);
+                            if($accountsId){
+                                $devicesId = Account::whereIn('id', $accountsId)->pluck('did', 'did')->toArray();
+                            }else{
+                                $devicesId = $Task->device_id;
+                            }
+                            $arr    = [
+                                'type'      => $tskType->type,
+                                'data'      => [
+                                    'configs'   => $Task->configs,
+                                    'quality'   => $Task->quality,
+                                    'file'      => $tskType->file,
+                                    'id'        => $Task->id,
+                                    'req_time'  => time(),
+                                ],
+                                'code'      => 200,
+                                'msg'       => '',
+                                'noreback'  => false,
+                                'start'     =>  $value['start'],
+                                'a_id'      =>  $admin,
+                                'devicesId' =>  implode(',', $devicesId),
+                            ];
+                            $acarr  = [];
+                            $accountObj = Account::whereIn('id', $Task->account_id)->get()->toArray();
+                            if($tskType->model){
+                                $is_arr = $this->call_user_func_array($tskType->model,$Task,$arr);
+                                if( $is_arr != false ){
+                                    return $is_arr;
                                 }
-                                $arr    = [
-                                    'type'      => $tskType->type,
-                                    'data'      => [
-                                        'configs'   => $Task->configs,
-                                        'quality'   => $Task->quality,
-                                        'file'      => $tskType->file,
-                                        'id'        => $Task->id,
-                                        'req_time'  => time(),
-                                    ],
-                                    'code'      => 200,
-                                    'msg'       => '',
-                                    'noreback'  => false,
-                                    'start'     =>  $value['start'],
-                                    'end'       =>  $value['end'],
-                                    'a_id'      =>  $admin,
-                                    'devicesId' =>  implode(',', $devicesId),
-                                ];
-                                $acarr  = [];
-                                $accountObj = Account::whereIn('id', $Task->account_id)->get()->toArray();
-                                if($tskType->model){
-                                    $is_arr = $this->call_user_func_array($tskType->model,$Task,$arr);
-                                    if( $is_arr != false ){
-                                        return $is_arr;
-                                    }
-                                }else{
-                                    return $arr;
-                                }
+                            }else{
+                                return $arr;
                             }
                         }
                     }
@@ -628,47 +595,5 @@ class TaskController extends AdminController
             $newArr[$val[$keyStr]][] = $val;
         }
         return $newArr;
-    }
-    public function dateBDate($date1, $date2) {
-        // 日期1是否大于日期2
-        $month1 = date("m", strtotime($date1));
-        $month2 = date("m", strtotime($date2));
-        $day1 = date("d", strtotime($date1));
-        $day2 = date("d", strtotime($date2));
-        $year1 = date("Y", strtotime($date1));
-        $year2 = date("Y", strtotime($date2));
-        $from = mktime(0, 0, 0, $month1, $day1, $year1);
-        $to = mktime(0, 0, 0, $month2, $day2, $year2);
-        if ($from > $to) {
-            return true;
-        } else {
-            return false;
-        } 
-    } 
-    /**
-     * 时间段重合判断
-     * @param array $data 日期数组
-     * @param string $fieldStart 开始日期字段名
-     * @param string $fieldEnd 结束日期字段名
-     * @return bool true为重合，false为不重合
-     */
-    public function is_time_cross(array $data, string $fieldStart = 'start', string $fieldEnd = 'end')
-    {        
-        // 按开始日期排序
-        array_multisort(
-            array_column($data, $fieldStart),
-            SORT_ASC,
-            $data
-        );
-        // 冒泡判断是否满足时间段重合的条件
-        $num = count($data);
-        for ($i = 1; $i < $num; $i++) {
-            $pre = $data[$i-1];
-            $current = $data[$i];
-            if (strtotime($pre[$fieldStart]) <= strtotime($current[$fieldEnd]) && strtotime($current[$fieldStart]) <= strtotime($pre[$fieldEnd])) {
-                return true;
-            }
-        }
-        return false;
     }
 }
