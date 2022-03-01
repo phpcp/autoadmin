@@ -60,4 +60,5 @@ Route::group([
 	Route::post('/getbyid/{id}', 'PublicController@getbyid')->name('getbyid')->where('id', '[0-9]+');
 	//接收任务结果
 	Route::post('/receiveTaskRes', 'TasksController@receiveTaskRes')->name('receiveTaskRes');
+	Route::post('/appdata', 'PublicController@appdata')->name('appdata');
 });

@@ -67,9 +67,9 @@ class PublicController extends Controller{
 		if(!$info || !$imei || !$token){
 			return Responses::error('错误.', 405);
 		}
-		if($version === null || $lang === null){
-			return Responses::error('app信息缺失!.', 405);
-		}
+		// if($version === null || $lang === null){
+		// 	return Responses::error('app信息缺失!.', 405);
+		// }
 		// $token 	= base64_decode($token);
 		$token 	= Ens::decrypt($token);
 		$token 	= json_decode($token, true);
@@ -85,39 +85,36 @@ class PublicController extends Controller{
 		if(!$rs instanceof Device){
 			return Responses::error($rs);
 		}
-		if(!$rs->soft_version || !$rs->soft_lang){
-			return Responses::error('请先确定tiktok版本号和使用语言!', null, 500, 200);
-		}
-		$tmp 		= TiktokVersionButton::where('version', $rs->soft_version)->first();
-		if(!$tmp || !$tmp->ids){
-			return Responses::error('版本 ' . $rs->soft_version . ' 目前不支持!', null, 500, 200);
-		}
-		$tkids 		= json_decode($tmp->ids, true);
-		$tktxts 	= LangToText::where('lang', $rs->soft_lang)->where(function($query) use($rs){
-			$query->whereRaw('version is null')->orWhere('version', $rs->soft_version);
-		})->orderBy('version', 'asc')->pluck('val', 'key')->toArray();
+		// if(!$rs->soft_version || !$rs->soft_lang){
+		// 	return Responses::error('请先确定tiktok版本号和使用语言!', null, 500, 200);
+		// }
+		// $tmp 		= TiktokVersionButton::where('version', $rs->soft_version)->first();
+		// if(!$tmp || !$tmp->ids){
+		// 	return Responses::error('版本 ' . $rs->soft_version . ' 目前不支持!', null, 500, 200);
+		// }
+		// $tkids 		= json_decode($tmp->ids, true);
+		// $tktxts 	= LangToText::where('lang', $rs->soft_lang)->where(function($query) use($rs){
+		// 	$query->whereRaw('version is null')->orWhere('version', $rs->soft_version);
+		// })->orderBy('version', 'asc')->pluck('val', 'key')->toArray();
 
 
-		$close_txt 	= [
-			'我知道了',
-			'以后再说',
-			'拒绝',
-			'同意',
-			'始终允许',
-			'好的',
-			'跳过广告',
-			'取消'
-		];
 		return Responses::success([
 			'num' 			=> $rs->user_num,
 			'id' 			=> $user->id,
 			'did' 			=> $rs->id,
-			'appversion' 	=> $rs->soft_version,
-			'applang' 		=> $rs->soft_lang,
-			'tkids'			=> $tkids,
-			'tktxts'		=> $tktxts,
-			'accounts'		=> Account::where('did', $rs->id)->count(),
-			'close_txt'		=> $close_txt,
+			// 'appversion' 	=> $rs->soft_version,
+			// 'applang' 		=> $rs->soft_lang,
+			'avatar'		=> $user->avatar,
+			'username'		=> $user->username,
+			'maxdevice'		=> $user->max_device,
+			'havdevices'	=> Device::where('admin_id', $user->id)->count(),
+			'islock'		=> $user->lock ? true : false,
+			'addtime'		=> date('Y-m-d H:i:s', strtotime($user->created_at)),
+			'groups'		=> $user->groups,
+			// 'tkids'			=> $tkids,
+			// 'tktxts'		=> $tktxts,
+			// 'accounts'		=> Account::where('did', $rs->id)->count(),
+			// 'close_txt'		=> $close_txt,
 		]);
 	}
 
@@ -158,17 +155,16 @@ class PublicController extends Controller{
 			$version 	= $deviceRow->soft_version;
 			$lang 		= $deviceRow->soft_lang;
 		}
-		if(!$version || !$lang){
-			return Responses::error('请现在后台设置tk对应的版本和语言! 编号: ' . $deviceRow->user_num);
-		}
+		// if(!$version || !$lang){
+		// 	return Responses::error('请现在后台设置tk对应的版本和语言! 编号: ' . $deviceRow->user_num);
+		// }
 
 		$token 		= AdminUser::token($user);
 		return Responses::success([
 			'token' 		=> $token,
-			// 'versionapi' 	=> url('api/mksureversion'),
-			// 'closetxtapi' 	=> url('api/getCloseTxt'),
-			'appversion' 	=> $version,
-			'applang'		=> $lang,
+        	'appdatasApi' => route('appdata'),
+			// 'appversion' 	=> $version,
+			// 'applang'		=> $lang,
 		]);
 	}
 
@@ -186,6 +182,11 @@ class PublicController extends Controller{
 		];
 		
 		return Responses::success(['list' => $arr]);
+	}
+
+	// 返回前端脚本需要的app参数
+	public function appdata(Request $request){
+
 	}
 
 	// 确定tiktok版本

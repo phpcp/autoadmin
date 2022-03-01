@@ -34,7 +34,8 @@ class TestController extends Controller{
 
 
     	$arr 	= [
-    		'ws'	=> 'ws://auto.mini.zhishukongjian.com:9130/client',
+    		// 'ws'	=> env('WS_LINK_URL'),//ws://auto.mini.zhishukongjian.com:9130/client',
+        'api' => route('auth'),
     		'token'	=> Ens::encrypt(json_encode(['id' => 1, 'time' => time()])),
     		// 'token'	=> ['id' => 1, 'time' => time()],
     	];
