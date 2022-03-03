@@ -3,7 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Group;
-use App\Models\Groupaccount;
+use App\Models\GroupAccount;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
