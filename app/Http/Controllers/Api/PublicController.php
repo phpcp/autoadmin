@@ -67,10 +67,10 @@ class PublicController extends Controller{
 		if(!$info || !$imei || !$token){
 			return Responses::error('错误.', 405);
 		}
-		// if($version === null || $lang === null){
-		// 	return Responses::error('app信息缺失!.', 405);
-		// }
-		// $token 	= base64_decode($token);
+		if($version === null || $lang === null){
+			return Responses::error('app信息缺失!.', 405);
+		}
+		$token 	= base64_decode($token);
 		$token 	= Ens::decrypt($token);
 		$token 	= json_decode($token, true);
 		if(!isset($token['id']) || !isset($token['login'])){
@@ -85,17 +85,17 @@ class PublicController extends Controller{
 		if(!$rs instanceof Device){
 			return Responses::error($rs);
 		}
-		// if(!$rs->soft_version || !$rs->soft_lang){
-		// 	return Responses::error('请先确定tiktok版本号和使用语言!', null, 500, 200);
-		// }
-		// $tmp 		= TiktokVersionButton::where('version', $rs->soft_version)->first();
-		// if(!$tmp || !$tmp->ids){
-		// 	return Responses::error('版本 ' . $rs->soft_version . ' 目前不支持!', null, 500, 200);
-		// }
-		// $tkids 		= json_decode($tmp->ids, true);
-		// $tktxts 	= LangToText::where('lang', $rs->soft_lang)->where(function($query) use($rs){
-		// 	$query->whereRaw('version is null')->orWhere('version', $rs->soft_version);
-		// })->orderBy('version', 'asc')->pluck('val', 'key')->toArray();
+		if(!$rs->soft_version || !$rs->soft_lang){
+			return Responses::error('请先确定tiktok版本号和使用语言!', null, 500, 200);
+		}
+		$tmp 		= TiktokVersionButton::where('version', $rs->soft_version)->first();
+		if(!$tmp || !$tmp->ids){
+			return Responses::error('版本 ' . $rs->soft_version . ' 目前不支持!', null, 500, 200);
+		}
+		$tkids 		= json_decode($tmp->ids, true);
+		$tktxts 	= LangToText::where('lang', $rs->soft_lang)->where(function($query) use($rs){
+			$query->whereRaw('version is null')->orWhere('version', $rs->soft_version);
+		})->orderBy('version', 'asc')->pluck('val', 'key')->toArray();
 
 
 		return Responses::success([
@@ -155,9 +155,9 @@ class PublicController extends Controller{
 			$version 	= $deviceRow->soft_version;
 			$lang 		= $deviceRow->soft_lang;
 		}
-		// if(!$version || !$lang){
-		// 	return Responses::error('请现在后台设置tk对应的版本和语言! 编号: ' . $deviceRow->user_num);
-		// }
+		if(!$version || !$lang){
+			return Responses::error('请现在后台设置tk对应的版本和语言! 编号: ' . $deviceRow->user_num);
+		}
 
 		$token 		= AdminUser::token($user);
 		return Responses::success([
