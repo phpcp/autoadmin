@@ -151,7 +151,8 @@ class TaskController extends AdminController
         }
 
         $accounts           = Account::where('admin_id', $adminId)->pluck('nickname', 'id');
-        $accountGroupsObj   = GroupAccount::where('admin_id', $adminId)->orderByDesc('orderby')->get();
+        // $accountGroupsObj   = GroupAccount::where('admin_id', $adminId)->orderByDesc('orderby')->get();
+        $accountGroupsObj   = Account::table('group_accounts')->where('admin_id', $adminId)->orderByDesc('orderby')->get();
         $accountGroups      = [];
         foreach ($accountGroupsObj as $value) {
             $accountGroups[$value->id]   = $value->name . '(' . $value->accounts . ')';
