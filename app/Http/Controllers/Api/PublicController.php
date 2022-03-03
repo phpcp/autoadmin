@@ -142,16 +142,16 @@ class PublicController extends Controller{
 		$lang 		= null;
 		$deviceRow 	= Device::where('admin_id', $user->id)->where('imei', $imei)->first();
 		if(!$deviceRow){
-			// $binded 	= Device::where('admin_id', $user->id)->where('imei', '!=', $imei)->count();
-			// if($binded >= $user->max_device){
-			// 	return Responses::error('设备绑定已达上限!', null, 401, 200);
-			// }
-			// Device::bind($imei, $user, $info, strtolower($version), strtolower($lang));
-			$deviceRow 		= Device::bind($imei, $user, [], strtolower($version), strtolower($lang));
-			if(!$deviceRow instanceof Device){
-				return Responses::error($deviceRow);
+			$binded 	= Device::where('admin_id', $user->id)->where('imei', '!=', $imei)->count();
+			if($binded >= $user->max_device){
+				return Responses::error('设备绑定已达上限!', null, 401, 200);
 			}
-		}else{
+			Device::bind($imei, $user, $info, strtolower($version), strtolower($lang));
+		// 	$deviceRow 		= Device::bind($imei, $user, [], strtolower($version), strtolower($lang));
+		// 	if(!$deviceRow instanceof Device){
+		// 		return Responses::error($deviceRow);
+		// 	}
+		// }else{
 			$version 	= $deviceRow->soft_version;
 			$lang 		= $deviceRow->soft_lang;
 		}
