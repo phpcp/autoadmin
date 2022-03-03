@@ -111,10 +111,10 @@ class PublicController extends Controller{
 			'islock'		=> $user->lock ? true : false,
 			'addtime'		=> date('Y-m-d H:i:s', strtotime($user->created_at)),
 			'groups'		=> $user->groups,
-			// 'tkids'			=> $tkids,
-			// 'tktxts'		=> $tktxts,
-			// 'accounts'		=> Account::where('did', $rs->id)->count(),
-			// 'close_txt'		=> $close_txt,
+			'tkids'			=> $tkids,
+			'tktxts'		=> $tktxts,
+			'accounts'		=> Account::where('did', $rs->id)->count(),
+			'close_txt'		=> $close_txt,
 		]);
 	}
 
@@ -163,8 +163,8 @@ class PublicController extends Controller{
 		return Responses::success([
 			'token' 		=> $token,
         	'appdatasApi' => route('appdata'),
-			// 'appversion' 	=> $version,
-			// 'applang'		=> $lang,
+			'appversion' 	=> $version,
+			'applang'		=> $lang,
 		]);
 	}
 
