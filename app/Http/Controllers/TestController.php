@@ -180,6 +180,7 @@ class TestController extends Controller{
 
     // 获取资源下载二维码
     public function resours(){
+      return '<div style="text-align:center;"><img src="' . Storage::url('images/domeapk.png') . '" style="max-width:90%;"> <div>脚本软件下载</div></div>';
       return '<div style="text-align:center;"><img src="' . Storage::url('images/domeapk.png') . '" style="max-width:90%;"> <div>脚本软件下载</div> <br><br> <img src="' . Storage::url('images/tiktok23.1.4.png') . '" style="max-width:90%;"> <div>tiktok下载</div> <br></div>';
     }
 }
