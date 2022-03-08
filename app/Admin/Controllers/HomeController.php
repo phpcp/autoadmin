@@ -24,6 +24,11 @@ class HomeController extends Controller
     public function index(Content $content)
     {
         return $content
+            ->title('欢迎!')
+            ->description('感谢您使用多米猫云控系统!')
+            ->row('<center><h1>多米猫群控系统</h1></center>')
+            ->row(view('useage'));
+        return $content
             ->title('Dashboard')
             ->description('Description...')
             ->row(Dashboard::title())
