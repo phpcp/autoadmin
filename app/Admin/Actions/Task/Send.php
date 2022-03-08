@@ -26,6 +26,7 @@ class Send extends RowAction
                 'quality'   => $form->quality,
                 'file'      => $tskType->file,
                 'id'        => $form->id,
+                'title'     => $form->name,
                 'req_time'  => time(),
             ];
             $arr    = [
