@@ -15,7 +15,7 @@ use App\Models\TaskType;
 use Encore\Admin\Facades\Admin;
 use App\Models\GroupDevice;
 use App\Models\DeviceToGroup;
-use App\Models\GroupAccount;
+// use App\Models\GroupAccount;
 use App\Models\AccountToGroup;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\MessageBag;
@@ -23,6 +23,7 @@ use App\Globals\WbApi;
 use Illuminate\Support\Facades\Storage;
 use App\Admin\Actions\Task\Send;
 use App\Admin\Actions\Task\Period;
+use Illuminate\Support\Facades\DB;
 
 use Encore\Admin\Layout\Content;
 use Illuminate\Http\Request;
@@ -151,7 +152,8 @@ class TaskController extends AdminController
         }
 
         $accounts           = Account::where('admin_id', $adminId)->pluck('nickname', 'id');
-        $accountGroupsObj   = GroupAccount::where('admin_id', $adminId)->orderByDesc('orderby')->get();
+        // $accountGroupsObj   = GroupAccount::where('admin_id', $adminId)->orderByDesc('orderby')->get();
+        $accountGroupsObj   = DB::table('group_accounts')->where('admin_id', $adminId)->pluck('nickname', 'id');;
         $accountGroups      = [];
         foreach ($accountGroupsObj as $value) {
             $accountGroups[$value->id]   = $value->name . '(' . $value->accounts . ')';
