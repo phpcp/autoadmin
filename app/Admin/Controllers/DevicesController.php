@@ -82,8 +82,8 @@ class DevicesController extends AdminController
         $grid->column('soft_version', __('app版本'))->editable('select', $allowerVers)->filter($allowerVers);
         $grid->column('soft_lang', __('app语言'))->editable('select', $allowerLangs)->filter($allowerLangs);
 
-        $grid->column('accounts', __('账号数'))->modal('该设备下登录的账号', function ($model) {
-            $comments = $model->account()->take(10)->get()->map(function ($comment) {
+        $grid->column('accounts', __('账号数'))->modal('该设备下登录的账号', function ($model) use($uid) {
+            $comments = $model->account()->where('admin_id', $uid)->take(10)->get()->map(function ($comment) {
                 return $comment->only(['id', 'nickname', 'uuid', 'follower_count', 'total_favorited', 'aweme_count']);
             });
 

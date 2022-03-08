@@ -21,8 +21,8 @@ Route::group([
     $router->resource('group-devices', GroupDevicesController::class);
     // $router->resource('tasks', TaskListsController::class);
     $router->resource('account-videos', AccountVideoController::class);
-    $router->resource('tasks', TaskController::class);
 
-    $router->any('/cycle', 'TaskController@cycle')->name('cycle');
     $router->get('tasks/{id}/account', 'TaskListsController@accounttask')->name('accounttask');
+    $router->any('tasks/cycle', 'TaskController@cycle')->name('cycle');
+    $router->resource('tasks', TaskController::class);
 });

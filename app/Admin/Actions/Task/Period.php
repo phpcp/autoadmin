@@ -11,7 +11,7 @@ class Period extends RowAction
     public function href()
     {
     	// $getRow = $this->getRow()->toArray();
-    	return "/admin/cycle?t_id=".$this->getKey();
+    	return "/admin/tasks/cycle?t_id=".$this->getKey();
     }
     // public function handle(Model $model, Request $request){
         // return $this->response()->success('周期性设置还在开发中')->refresh();

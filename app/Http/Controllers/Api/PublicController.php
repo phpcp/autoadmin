@@ -12,6 +12,7 @@ use App\Models\Task;
 use App\Models\TiktokVersionButton;
 use App\Models\LangToText;
 use App\Models\Account;
+use App\Models\Tiktok;
 use App\Globals\Wbapi;
 
 class PublicController extends Controller{
@@ -58,19 +59,13 @@ class PublicController extends Controller{
 			return Responses::error('错误!', 405);
 		}
 		$rrrs 		= json_decode(Ens::decrypt(base64_decode($token)), true);
-		// file_put_contents(__DIR__ . '/1.txt', json_encode($rrrs) . "\r\n" . $token);
-		$info 		= $rrrs['info'] ?? null;
 		$imei 		= $rrrs['imei'] ?? null;
 		$version 	= $rrrs['version'] ?? null;
 		$lang 		= $rrrs['lang'] ?? null;
 		$token 		= $rrrs['token'] ?? null;
-		if(!$info || !$imei || !$token){
+		if(!$imei || !$token){
 			return Responses::error('错误.', 405);
 		}
-		if($version === null || $lang === null){
-			return Responses::error('app信息缺失!.', 405);
-		}
-		$token 	= base64_decode($token);
 		$token 	= Ens::decrypt($token);
 		$token 	= json_decode($token, true);
 		if(!isset($token['id']) || !isset($token['login'])){
@@ -78,24 +73,28 @@ class PublicController extends Controller{
 		}
 		$user 		= AdminUser::find($token['id']);
 		if($user->endtime && $user->endtime < time()){
-			return Responses::error('您的授权已到期!', null, 200, 401);
+			return Responses::error('您的授权已过期!', null, 200, 401);
 		}
 
-		$rs 		= Device::bind($imei, $user, $info, strtolower($version), strtolower($lang));
+		if(!$version){
+			$tk 		= Tiktok::last();
+			$version 	= $tk ? $tk->version : '';
+		}
+		$rs 		= Device::bind($imei, $user, null, strtolower($version));
 		if(!$rs instanceof Device){
 			return Responses::error($rs);
 		}
-		if(!$rs->soft_version || !$rs->soft_lang){
-			return Responses::error('请先确定tiktok版本号和使用语言!', null, 500, 200);
-		}
-		$tmp 		= TiktokVersionButton::where('version', $rs->soft_version)->first();
-		if(!$tmp || !$tmp->ids){
-			return Responses::error('版本 ' . $rs->soft_version . ' 目前不支持!', null, 500, 200);
-		}
-		$tkids 		= json_decode($tmp->ids, true);
-		$tktxts 	= LangToText::where('lang', $rs->soft_lang)->where(function($query) use($rs){
-			$query->whereRaw('version is null')->orWhere('version', $rs->soft_version);
-		})->orderBy('version', 'asc')->pluck('val', 'key')->toArray();
+		// if(!$rs->soft_version || !$rs->soft_lang){
+		// 	return Responses::error('请先确定tiktok版本号和使用语言!', null, 500, 200);
+		// }
+		// $tmp 		= TiktokVersionButton::where('version', $rs->soft_version)->first();
+		// if(!$tmp || !$tmp->ids){
+		// 	return Responses::error('版本 ' . $rs->soft_version . ' 目前不支持!', null, 500, 200);
+		// }
+		// $tkids 		= json_decode($tmp->ids, true);
+		// $tktxts 	= LangToText::where('lang', $rs->soft_lang)->where(function($query) use($rs){
+		// 	$query->whereRaw('version is null')->orWhere('version', $rs->soft_version);
+		// })->orderBy('version', 'asc')->pluck('val', 'key')->toArray();
 
 
 		return Responses::success([
@@ -111,10 +110,10 @@ class PublicController extends Controller{
 			'islock'		=> $user->lock ? true : false,
 			'addtime'		=> date('Y-m-d H:i:s', strtotime($user->created_at)),
 			'groups'		=> $user->groups,
-			'tkids'			=> $tkids,
-			'tktxts'		=> $tktxts,
-			'accounts'		=> Account::where('did', $rs->id)->count(),
-			'close_txt'		=> $close_txt,
+			// 'tkids'			=> $tkids,
+			// 'tktxts'		=> $tktxts,
+			// 'accounts'		=> Account::where('did', $rs->id)->count(),
+			// 'close_txt'		=> $close_txt,
 		]);
 	}
 
@@ -142,29 +141,29 @@ class PublicController extends Controller{
 		$lang 		= null;
 		$deviceRow 	= Device::where('admin_id', $user->id)->where('imei', $imei)->first();
 		if(!$deviceRow){
-			$binded 	= Device::where('admin_id', $user->id)->where('imei', '!=', $imei)->count();
-			if($binded >= $user->max_device){
-				return Responses::error('设备绑定已达上限!', null, 401, 200);
+			// $binded 	= Device::where('admin_id', $user->id)->where('imei', '!=', $imei)->count();
+			// if($binded >= $user->max_device){
+			// 	return Responses::error('设备绑定已达上限!', null, 401, 200);
+			// }
+			// Device::bind($imei, $user, $info, strtolower($version), strtolower($lang));
+			$deviceRow 		= Device::bind($imei, $user, [], strtolower($version), strtolower($lang));
+			if(!$deviceRow instanceof Device){
+				return Responses::error($deviceRow);
 			}
-			Device::bind($imei, $user, $info, strtolower($version), strtolower($lang));
-		// 	$deviceRow 		= Device::bind($imei, $user, [], strtolower($version), strtolower($lang));
-		// 	if(!$deviceRow instanceof Device){
-		// 		return Responses::error($deviceRow);
-		// 	}
-		// }else{
+		}else{
 			$version 	= $deviceRow->soft_version;
 			$lang 		= $deviceRow->soft_lang;
 		}
-		if(!$version || !$lang){
-			return Responses::error('请现在后台设置tk对应的版本和语言! 编号: ' . $deviceRow->user_num);
-		}
+		// if(!$version || !$lang){
+		// 	return Responses::error('请现在后台设置tk对应的版本和语言! 编号: ' . $deviceRow->user_num);
+		// }
 
 		$token 		= AdminUser::token($user);
 		return Responses::success([
 			'token' 		=> $token,
         	'appdatasApi' => route('appdata'),
-			'appversion' 	=> $version,
-			'applang'		=> $lang,
+			// 'appversion' 	=> $version,
+			// 'applang'		=> $lang,
 		]);
 	}
 

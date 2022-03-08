@@ -26,7 +26,6 @@ use App\Admin\Actions\Task\Period;
 
 use Encore\Admin\Layout\Content;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 class TaskController extends AdminController
 {
     /**
@@ -152,8 +151,7 @@ class TaskController extends AdminController
         }
 
         $accounts           = Account::where('admin_id', $adminId)->pluck('nickname', 'id');
-        // $accountGroupsObj   = GroupAccount::where('admin_id', $adminId)->orderByDesc('orderby')->get();
-        $accountGroupsObj   = DB::table('group_accounts')->where('admin_id', $adminId)->orderByDesc('orderby')->get();
+        $accountGroupsObj   = GroupAccount::where('admin_id', $adminId)->orderByDesc('orderby')->get();
         $accountGroups      = [];
         foreach ($accountGroupsObj as $value) {
             $accountGroups[$value->id]   = $value->name . '(' . $value->accounts . ')';
@@ -427,6 +425,7 @@ class TaskController extends AdminController
         switch ($type) {
             case '1':
                 $TaskRedis = Redis::get('Task');
+                // dd($TaskRedis);
                 $TaskRedisArray = [];
                 if( !empty( $TaskRedis )){
                     //删除相关ID
@@ -441,7 +440,9 @@ class TaskController extends AdminController
                 $admin = Admin::user()->id;
                 $TaskText = $this->addRedis($Task,$admin);
                 if( $TaskText ){
-                    array_push($TaskRedisArray, $TaskText);
+                    foreach ($TaskText as $key => $value) {
+                        array_push($TaskRedisArray, $value);
+                    }
                 }
                 if( !empty($TaskRedisArray)){
                     $TaskRedisArray = array_merge($TaskRedisArray);
@@ -455,7 +456,9 @@ class TaskController extends AdminController
                     $admin = $value->admin_id;
                     $TaskText = $this->addRedis($value,$admin);
                     if( $TaskText ){
-                        array_push($TaskRedisArray, $TaskText);
+                        foreach ($TaskText as $key => $value) {
+                            array_push($TaskRedisArray, $value);
+                        }
                     }
                 }
                 if( !empty($TaskRedisArray)){
@@ -478,39 +481,47 @@ class TaskController extends AdminController
                 if( $Task->time_frame ){
                     $tskType = TaskType::find($Task->task_id);
                     if( $tskType ){
+                        $result = [];
                         foreach ($Task->time_frame as $key => $value){
-                            $accountsId = array_filter($Task->account_id);
-                            if($accountsId){
-                                $devicesId = Account::whereIn('id', $accountsId)->pluck('did', 'did')->toArray();
-                            }else{
-                                $devicesId = $Task->device_id;
-                            }
-                            $arr    = [
-                                'type'      => $tskType->type,
-                                'data'      => [
-                                    'configs'   => $Task->configs,
-                                    'quality'   => $Task->quality,
-                                    'file'      => $tskType->file,
-                                    'id'        => $Task->id,
-                                    'req_time'  => time(),
-                                ],
-                                'code'      => 200,
-                                'msg'       => '',
-                                'noreback'  => false,
-                                'start'     =>  $value['start'],
-                                'a_id'      =>  $admin,
-                                'devicesId' =>  implode(',', $devicesId),
-                            ];
-                            $acarr  = [];
-                            $accountObj = Account::whereIn('id', $Task->account_id)->get()->toArray();
-                            if($tskType->model){
-                                $is_arr = $this->call_user_func_array($tskType->model,$Task,$arr);
-                                if( $is_arr != false ){
-                                    return $is_arr;
+                            if( strtotime($value['start']) >= time()){
+                                $accountsId = array_filter($Task->account_id);
+                                if($accountsId){
+                                    $devicesId = Account::whereIn('id', $accountsId)->pluck('did', 'did')->toArray();
+                                }else{
+                                    $devicesId = $Task->device_id;
                                 }
-                            }else{
-                                return $arr;
+                                $arr    = [
+                                    'type'      => $tskType->type,
+                                    'data'      => [
+                                        'configs'   => $Task->configs,
+                                        'quality'   => $Task->quality,
+                                        'file'      => $tskType->file,
+                                        'id'        => $Task->id,
+                                        'req_time'  => time(),
+                                    ],
+                                    'code'      => 200,
+                                    'msg'       => '',
+                                    'noreback'  => false,
+                                    'start'     =>  $value['start'],
+                                    'a_id'      =>  $admin,
+                                    'devicesId' =>  implode(',', $devicesId),
+                                ];
+                                $acarr  = [];
+                                $accountObj = Account::whereIn('id', $Task->account_id)->get()->toArray();
+                                if($tskType->model){
+                                    $is_arr = $this->call_user_func_array($tskType->model,$Task,$arr);
+                                    if( $is_arr != false ){
+                                        array_push($result,$is_arr);
+                                        // return $is_arr;
+                                    }
+                                }else{
+                                    array_push($result,$arr);
+                                    // return $arr;
+                                }
                             }
+                        }
+                        if( !empty($result)){
+                            return $result;
                         }
                     }
                 }

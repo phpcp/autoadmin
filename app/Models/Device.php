@@ -33,10 +33,13 @@ class Device extends Model{
 			if($user->id != $device->admin_id){
 				return '请先后台解绑!';
 			}
-			if(is_array($info)){
-				$info 		= json_encode($info);
+			if($info){
+				if(is_array($info)){
+					$info 		= json_encode($info);
+				}
+				$device->info 	= $info;
 			}
-			$device->info 	= $info;
+
 			if(!$device->soft_version){
 				$device->soft_version 	= $version;
 			}

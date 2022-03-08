@@ -61,4 +61,9 @@ Route::group([
 	//接收任务结果
 	Route::post('/receiveTaskRes', 'TasksController@receiveTaskRes')->name('receiveTaskRes');
 	Route::post('/appdata', 'PublicController@appdata')->name('appdata');
+
+	Route::post('/checkversion', 'AutojsController@version')->name('checkversion');
+	Route::post('/tkversion', 'AutojsController@tkversion')->name('tkversion');
+	Route::post('/authv2', 'AutojsController@auth')->name('authv2');
+	Route::post('/tkdts', 'AutojsController@tiktokBtns')->name('tkdts');
 });
