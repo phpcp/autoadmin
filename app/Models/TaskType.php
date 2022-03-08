@@ -76,7 +76,7 @@ class TaskType extends Model{
 
     	$sendArr 		= [];
     	foreach($accountObj as $item){
-    		$sendArr[$item['did']][$item['id']] 	= $item['nickname'];
+    		$sendArr[$item['did']][$item['id']] 	= $item['unique_id'];//$item['nickname'];
     	}
 
     	$msg 			= [];
