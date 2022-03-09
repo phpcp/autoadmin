@@ -40,7 +40,7 @@ class LangToTextsController extends AdminController
             });
             $filter->column(1/2, function ($filter) {
                 $filter->like('key', __('脚本端—KEY'));
-                $filter->like('val', __('TikTok—ID/VIEM'));
+                $filter->like('val', __('TikTok—TEXT'));
             });
         });
         $grid->actions(function ($actions) {
