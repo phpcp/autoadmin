@@ -27,12 +27,12 @@ class Device extends Model{
 
 	// 获取设备
 	public static function bind(string $imei, AdminUser $user, $info = null, $version = null, $lang = null){
-		$device 	= self::where('imei', $imei)->first();
+		$device 	= self::where('imei', $imei)->where('admin_id', $user->id)->first();
 
 		if($device){
-			if($user->id != $device->admin_id){
-				return '请先后台解绑!';
-			}
+			// if($user->id != $device->admin_id){
+			// 	return '请先后台解绑!';
+			// }
 			if($info){
 				if(is_array($info)){
 					$info 		= json_encode($info);
