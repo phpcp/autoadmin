@@ -238,7 +238,7 @@ class PublicController extends Controller{
 		if($user->endtime && $user->endtime <= time()){
 			return Responses::error('您的授权已到期!', null, 401, 200);
 		}
-		$accounts 		= Account::select('accounts.id', 'accounts.uuid', 'accounts.avatar', 'accounts.nickname', 'devices.user_num')->where('accounts.admin_id', $user->id)->rightJoin('devices', 'accounts.did', '=', 'devices.id')->get();
+		$accounts 		= Account::select('accounts.id', 'accounts.uuid', 'accounts.avatar', 'accounts.nickname', 'devices.user_num')->where('accounts.admin_id', $user->id)->where('accounts.admin_id', $user)->where('devices.admin_id', $user)->rightJoin('devices', 'accounts.did', '=', 'devices.id')->get();
 		$accountsArr 	= [];
 		foreach($accounts as $item){
 			$accountsArr[] 	= ['name' => $item->nickname . ' ('.$item->uuid.')', 'avatar' => $item->avatar, 'id' => $item->id, 'user_num' => $item->user_num];
