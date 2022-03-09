@@ -216,6 +216,10 @@ class PublicController extends Controller{
 	// 提供给pc端的接口, 显示当前账号
 	public function topcaccounts(Request $request){
 		$token 	= $request->input('token');
+		if(!$token){
+			return Responses::error('非法请求!', null, 500, 500);
+		}
+		$token 	= base64_decode($token);
 		$req 	= json_decode(Ens::decrypt($token), true);
 		if(!isset($req['id']) || !isset($req['time']) && $req['id'] < 1){
 			return Responses::error('非法请求!', null, 500, 500);
@@ -223,8 +227,10 @@ class PublicController extends Controller{
 		// if((time() - $req['time']) >= env('QRCODE_TIMEOUT', 180)){
 		// 	return Responses::error('页面已过期,请重新请求!', null, 401, 200);
 		// }
-
 		$user 		= AdminUser::find($req['id']);
+		if(!$user){
+			return Responses::error('非法请求!', null, 401, 200);
+		}
 		if($user->endtime && $user->endtime <= time()){
 			return Responses::error('您的授权已到期!', null, 401, 200);
 		}
