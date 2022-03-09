@@ -1,4 +1,18 @@
 
+1/ 增加数据表	tkbtns		Tiktok参数
+	字段名称		类型		默认		是否为空		备注
+	id			int(11)				NO			ID 自增
+	key			varchar(255)			NO			脚本端取的key
+	val			varchar(255)			NO			tk对应的id号
+	varsion			varchar(255)			NO			tk版本
+	remark			text				YES			备注
+	status			tinyint		1		NO			状态 1为正常 2为禁用
+	type			tinyint		1		NO			类型 1为ID 2为text
+	
+2/ 增加权限与菜单  http://192.168.110.225:8081/admin/tkbtns
+
+//---------------------------------------------------------------------------------------------------
+
 1/ .env 文件 添加  
 	REDIS_CLIENT=predis
 
