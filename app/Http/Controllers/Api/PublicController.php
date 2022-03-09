@@ -14,6 +14,7 @@ use App\Models\LangToText;
 use App\Models\Account;
 use App\Models\Tiktok;
 use App\Globals\Wbapi;
+use Illuminate\Support\Facades\Storage;
 
 class PublicController extends Controller{
 	// public function scan(Request $request){
@@ -219,8 +220,11 @@ class PublicController extends Controller{
 		if(!$token){
 			return Responses::error('非法请求!', null, 500, 500);
 		}
-		$token 	= base64_decode($token);
 		$req 	= json_decode(Ens::decrypt($token), true);
+		if(!$req){
+			$token 	= base64_decode($token);
+			$req 	= json_decode(Ens::decrypt($token), true);
+		}
 		if(!isset($req['id']) || !isset($req['time']) && $req['id'] < 1){
 			return Responses::error('非法请求!', null, 500, 500);
 		}
@@ -244,6 +248,23 @@ class PublicController extends Controller{
 
 	// 接收文件上传
 	public function uploaded(Request $request){
+		$token 		= $request->get('token');
+		// $token 	= $request->input('token');
+		if(!$token){
+			return Responses::error('非法请求!', null, 401, 200);
+		}
+		$req 	= json_decode(Ens::decrypt($token), true);
+		if(!$req){
+			$token 	= base64_decode($token);
+			$req 	= json_decode(Ens::decrypt($token), true);
+		}
+		if(!isset($req['id']) || !isset($req['time']) && $req['id'] < 1){
+			return Responses::error('非法请求!!', null, 500, 500);
+		}
+		$user 		= AdminUser::find($req['id']);
+		if(!$user){
+			return Responses::error('用户不存在!', null, 401, 200);
+		}
 		return $request->file('uploadfile')->store('public/autouploaded');
 	}
 
@@ -257,13 +278,21 @@ class PublicController extends Controller{
 		if(!$token || !$media || !$account_id){
 			return Responses::error('非法请求!', null, 500, 500);
 		}
-		$rrrs 			= json_decode(Ens::decrypt($token), true);
-		$adminId		= $rrrs['id'] ?? null;
+		$req 	= json_decode(Ens::decrypt($token), true);
+		if(!$req){
+			$token 	= base64_decode($token);
+			$req 	= json_decode(Ens::decrypt($token), true);
+		}
+		// $rrrs 			= json_decode(Ens::decrypt($token), true);
+		$adminId		= $req['id'] ?? null;
 		if(!$adminId){
 			return Responses::error('非法请求!', null, 500, 501);
 		}
 
 		$user 			= AdminUser::find($adminId);
+		if(!$user){
+			return Responses::error('非法请求!!', null, 401, 401);
+		}
 		if($user->endtime && $user->endtime <= time()){
 			return Responses::error('您的授权已到期!', null, 401, 401);
 		}
@@ -300,6 +329,95 @@ class PublicController extends Controller{
 		// 	'configs'	=> [],
 		// 	'runtype'	=> 0,
 		// ];
+	}
+
+	//从pc端的任务像手机端发送
+	public function signle(Request $request){
+		$token 			= $request->input('token');
+		$accounts 		= $request->input('accounts');
+		$videos 		= $request->input('videos');
+		// var_dump($videos);
+		// return;
+		if(!$token){
+			return Responses::error('非法请求.', null, 401, 200);
+		}
+		$req 	= json_decode(Ens::decrypt($token), true);
+		if(!$req){
+			$token 	= base64_decode($token);
+			$req 	= json_decode(Ens::decrypt($token), true);
+		}
+		if(!isset($req['id']) || !isset($req['time']) && $req['id'] < 1){
+			return Responses::error('非法请求!', null, 500, 500);
+		}
+		$user 		= AdminUser::find($req['id']);
+		if(!$user){
+			return Responses::error('用户不存在!', null, 401, 200);
+		}
+		if(!$accounts || !is_array($accounts)){
+			return Responses::error('非法请求!!', null, 500, 500);
+		}
+		if(!$videos || !is_array($videos)){
+			return Responses::error('非法请求!!!', null, 500, 500);
+		}
+		if(count($videos) < count($accounts)){
+			return Responses::error('视频不够发!!', null, 500, 500);
+		}
+		$accounts 	= Account::select('accounts.id as aid', 'accounts.uuid as uuid', 'devices.id as did')
+						->whereIn('accounts.id', $accounts)
+						->where('accounts.admin_id', $user->id)
+						->where('devices.admin_id', $user->id)
+						->leftJoin('devices', 'accounts.did', '=', 'devices.id')
+						->get()->toArray();
+		if(count($accounts) < 1){
+			return Responses::error('找不到账号!!', null, 500, 500);
+		}
+		$confis 	= [];
+		// $accLen 	= count($accounts);
+		// $videoLen 	= count($videos);
+		// $onAccountVideos 	= (int)($videoLen / $accLen);//一个账号分配多少视频
+		// foreach($accounts as $item){
+		// 	$confis[$item->did][$item->nickname]
+		// }
+
+		$tmpAccounts 	= [];
+		foreach($videos as $item){
+			if(count($tmpAccounts) < 1){
+				$tmpAccounts 	= $accounts;
+			}
+			if(!isset($confis[$tmpAccounts[0]['did']])){
+				$confis[$tmpAccounts[0]['did']] 	= [];
+			}
+			if(!isset($confis[$tmpAccounts[0]['did']][$tmpAccounts[0]['uuid']])){
+				$confis[$tmpAccounts[0]['did']][$tmpAccounts[0]['uuid']] 	= [];
+			}
+			$item['media']		= Storage::url($item['media']);
+			$item['uuid']		= $tmpAccounts[0]['uuid'];
+			$confis[$tmpAccounts[0]['did']][$tmpAccounts[0]['uuid']][] 		= $item;
+			unset($tmpAccounts[0]);
+			$tmpAccounts 	= array_values($tmpAccounts);
+		}
+		$resps 	= [];
+		$base 	= [
+			'type'      => 'post',
+			'data'      => [
+				'quality'   => 99,
+				'file'      => 'post',
+				'id'        => 0,
+				'title'     => '来自客户端自动发布',
+				'req_time'  => time(),
+			],
+			'code'      => 200,
+			'msg'       => '',
+			'noreback'  => false,
+        ];
+		foreach($confis as $did => $arr){
+			$err 			= $base;
+			$err['data']['confis']	= $arr;
+			// var_dump($err);
+			$resps[] 		= WbApi::send($user->id, $did, $err);
+		}
+		// var_dump($resps);
+		return Responses::success($resps);
 	}
 
 	// 通过adminid返回ws和token
