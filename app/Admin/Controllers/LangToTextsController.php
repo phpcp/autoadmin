@@ -2,20 +2,20 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\Tkbtns;
+use App\Models\LangToText;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 
-class TkbtnsController extends AdminController
+class LangToTextsController extends AdminController
 {
     /**
      * Title for current resource.
      *
      * @var string
      */
-    protected $title = 'TikTok参数';
+    protected $title = 'TikTok参数--TEXT';
 
     /**
      * Make a grid builder.
@@ -24,32 +24,19 @@ class TkbtnsController extends AdminController
      */
     protected function grid()
     {
-        $grid = new Grid(new Tkbtns());
-        $grid->column('id', __('Id'))->hide();
-        $grid->column('type', __('类型'))->using(['1' => 'ID', '2' => 'VIEM']);
+        $grid = new Grid(new LangToText());
+        $grid->column('id', __('Id'));
         $grid->column('version', __('TikTok—版本'));
+        $grid->column('lang', __('语言-ISO'));
         $grid->column('key', __('脚本端—KEY'));
-        $grid->column('val', __('TikTok—ID/VIEM'));
-        $grid->column('remark', __('备注'));
-        $states = [
-            'on'  => ['value' => 1, 'text' => '正常', 'color' => 'primary'],
-            'off' => ['value' => 2, 'text' => '禁用', 'color' => 'default'],
-        ];
-        $grid->column('status', __('状态'))->switch($states)->sortable();
-
+        $grid->column('val', __('TikTok—TEXT'));
+        
         $grid->filter(function($filter){
             // 去掉默认的id过滤器
             $filter->disableIdFilter();
             $filter->column(1/2, function ($filter) {
-                $filter->equal('type', __('类型'))->radio([
-                    1 => 'ID',
-                    2 => 'VIEM',
-                ]);
-                $filter->equal('status', __('状态'))->radio([
-                    1 => '正常',
-                    2 => '禁用',
-                ]);
-                $filter->like('varsion', __('TikTok—版本'));
+                $filter->like('lang', __('语言-ISO'));
+                $filter->like('version', __('TikTok—版本'));
             });
             $filter->column(1/2, function ($filter) {
                 $filter->like('key', __('脚本端—KEY'));
@@ -71,7 +58,7 @@ class TkbtnsController extends AdminController
      */
     protected function detail($id)
     {
-        $show = new Show(Tkbtns::findOrFail($id));
+        $show = new Show(LangToText::findOrFail($id));
         $show->field('id', __('Id'));
         $show->field('name', __('Name'));
         $show->field('email', __('Email'));
@@ -92,15 +79,12 @@ class TkbtnsController extends AdminController
      */
     protected function form()
     {
-        $form = new Form(new Tkbtns());
-
-        $form->radio('type', __('类型'))->options(['1' => 'ID', '2'=> 'VIEM'])->default('1')->required();
-        $form->text('version', __('TikTok—版本'))->required();
+        $form = new Form(new LangToText());
+        $form->text('lang', __('语言-ISO'))->required();
+        $form->text('version', __('TikTok—版本'));
         $form->text('key', __('脚本端—KEY'))->required();
-        $form->text('val', __('TikTok—ID/VIEM'))->required();
-        $form->textarea('remark', __('备注'));
-        $form->radio('status', __('状态'))->options(['1' => '正常', '2'=> '禁用'])->default('1')->required();
-
+        $form->text('val', __('TikTok—TEXT'))->required();
+        
         $form->tools(function (Form\Tools $tools) {
             $tools->disableDelete();
             $tools->disableView();

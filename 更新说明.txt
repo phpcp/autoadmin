@@ -7,9 +7,14 @@
 	varsion			varchar(255)			NO			tk版本
 	remark			text				YES			备注
 	status			tinyint		1		NO			状态 1为正常 2为禁用
-	type			tinyint		1		NO			类型 1为ID 2为text
+	type			tinyint		1		NO			类型 1为ID 2为view
+
+2/ 修改数据表   lang_to_texts
+	增加字段： 	字段名称：id		类型：int(11)		默认：0  不为空		备注：ID 自增
+
 	
-2/ 增加权限与菜单  http://192.168.110.225:8081/admin/tkbtns
+2/ 增加权限与菜单  http://192.168.110.225:8081/admin/tkbtns				//TikTok--ID
+2/ 增加权限与菜单  http://192.168.110.225:8081/admin/lang_to_text			//TikTok--TEXT
 
 //---------------------------------------------------------------------------------------------------
 
