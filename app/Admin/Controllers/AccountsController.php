@@ -22,6 +22,7 @@ use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
 use Endroid\QrCode\Writer\PngWriter;
 use App\Globals\Ens;
 use App\Admin\Actions\Account\Task;
+use Illuminate\Support\Facades\DB;
 
 class AccountsController extends AdminController
 {
