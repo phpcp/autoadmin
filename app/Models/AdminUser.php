@@ -25,6 +25,18 @@ class AdminUser extends Model{
 
     // 解析token并返回 AdminUser 实例
     public static function unToken(string $token){
+    	return Ens::decrypt($token);
+    }
 
+    // 检测 token 是否正确
+    // 这里不做二重验证了
+    public static function verfyToken(string $token){
+    	$res 		= self::unToken($token);
+    	if($res && is_string($res)){
+    		$res 	= json_decode($res, true);
+    		return isset($res['token']) ? true : false;
+    	}else{
+    		return false;
+    	}
     }
 }

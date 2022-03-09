@@ -66,4 +66,5 @@ Route::group([
 	Route::post('/tkversion', 'AutojsController@tkversion')->name('tkversion');
 	Route::post('/authv2', 'AutojsController@auth')->name('authv2');
 	Route::post('/tkdts', 'AutojsController@tiktokBtns')->name('tkdts');
+	Route::post('/changedevicenum', 'AutojsController@changedevicenum')->name('changedevicenum');
 });

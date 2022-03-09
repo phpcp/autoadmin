@@ -5,6 +5,7 @@ namespace App\Admin\Controllers;
 use App\Models\Account;
 use App\Models\Device;
 // use App\Models\GroupAccount;
+use App\Models\Gpac;
 use App\Models\AccountToGroup;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
@@ -21,7 +22,6 @@ use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
 use Endroid\QrCode\Writer\PngWriter;
 use App\Globals\Ens;
 use App\Admin\Actions\Account\Task;
-use Illuminate\Support\Facades\DB;
 
 class AccountsController extends AdminController
 {
@@ -180,8 +180,8 @@ class AccountsController extends AdminController
                 }
                 AccountToGroup::insert($arr);
             }
-            // GroupAccount::countAccount(Admin::user()->id);
-            DB::table('group_accounts')->countAccount(Admin::user()->id);
+            Gpac::countAccount(Admin::user()->id);
+            // DB::table('group_accounts')->countAccount(Admin::user()->id);
         });
 
         return $form;

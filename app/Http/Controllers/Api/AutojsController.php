@@ -57,6 +57,9 @@ class AutojsController extends Controller{
 		$versionCode 	= $request->input('versionCode');
 		$versionName 	= $request->input('versionName');
 		$token 			= $request->input('token');
+		if(!AdminUser::verfyToken($token)){
+			return response()->json(['code' => 500, 'msg' => '非法请求!', 'data' => $data]);
+		}
 
 		$data 			= [
 			'code' => 400,
@@ -75,6 +78,9 @@ class AutojsController extends Controller{
 	public function tkversion(Request $request){
 		$nowVersion 	= $request->input('tkversion');
 		$token 			= $request->input('token');
+		if(!AdminUser::verfyToken($token)){
+			return response()->json(['code' => 500, 'msg' => '非法请求!', 'data' => $data]);
+		}
 
 		$last 			= Tiktok::last();
 		if(!$last){
@@ -103,6 +109,10 @@ class AutojsController extends Controller{
 	// 根据tiktok版本和语言 获取tiktok 按键id和文本
 	public function tiktokBtns(Request $request){
 		$token 		= $request->input('token');
+		if(!AdminUser::verfyToken($token)){
+			return response()->json(['code' => 500, 'msg' => '非法请求!', 'data' => $data]);
+		}
+
 		$id 		= (int)$request->input('id');
 		$imei 		= $request->input('imei');
 		if($id < 1 || !$imei){
@@ -139,5 +149,28 @@ class AutojsController extends Controller{
 			'tiktok_close'	=> [],
 		];
 		return response()->json(['code' => 200, 'msg' => '', 'data' => $data]);
+	}
+
+	// 修改设备id
+	public function changedevicenum(Request $request){
+		$num 	= $request->input('num');
+		$token 	= $request->input('token');
+		$did 	= $request->input('id');
+
+		if(!AdminUser::verfyToken($token)){
+			return response()->json(['code' => 500, 'msg' => '非法请求!', 'data' => '']);
+		}
+		$device 	= Device::find($did);
+		if(!$device){
+			return response()->json(['code' => 500, 'msg' => '设备不存在!', 'data' => '']);
+		}
+		if($device->user_num == $num){
+			return response()->json(['code' => 500, 'msg' => '未更改!', 'data' => '']);
+		}
+		$device->user_num 	= $num;
+		if($device->save()){
+			return response()->json(['code' => 200, 'msg' => '修改成功!', 'data' => ['number' => $device->user_num]]);
+		}
+		return response()->json(['code' => 500, 'msg' => '系统错误!', 'data' => '']);
 	}
 }
