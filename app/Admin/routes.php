@@ -27,4 +27,7 @@ Route::group([
     $router->get('tasks/{id}/account', 'TaskListsController@accounttask')->name('accounttask');
     $router->any('tasks/cycle', 'TaskController@cycle')->name('cycle');
     $router->resource('tasks', TaskController::class);
+    $router->resource('tklangs', TklangController::class);
+    $router->resource('appversions', AppversionsController::class);
+    $router->resource('tiktoks', TiktokversionsController::class);
 });

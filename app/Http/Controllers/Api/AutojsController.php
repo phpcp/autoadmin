@@ -13,6 +13,7 @@ use App\Models\Device;
 use App\Models\TiktokVersionButton;
 use App\Models\LangToText;
 use App\Models\Appversion;
+use Illuminate\Support\Facades\Storage;
 
 use App\Models\Tkbtns;
 class AutojsController extends Controller{
@@ -71,7 +72,7 @@ class AutojsController extends Controller{
 			$data 			= [
 				'code' => 200,
 				'data' => [
-					'downloadurl' 	=> $lastVersion->url,
+					'downloadurl' 	=> Storage::disk('admin')->url($lastVersion->url),
 					'appname'		=> basename($lastVersion->url),
 					'remark' 		=> $lastVersion->remark,
 					'infourl' 		=> ''
