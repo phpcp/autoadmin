@@ -7,6 +7,7 @@ use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Models\Tiktok;
 
 class TkbtnsController extends AdminController
 {
@@ -25,6 +26,7 @@ class TkbtnsController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new Tkbtns());
+        $tiktoks    = Tiktok::pluck('version', 'version');
         $grid->column('id', __('Id'))->hide();
         $grid->column('type', __('类型'))->using(['1' => 'ID', '2' => 'VIEM']);
         $grid->column('version', __('TikTok—版本'));
@@ -70,10 +72,11 @@ class TkbtnsController extends AdminController
      */
     protected function form()
     {
+        $tiktoks    = Tiktok::pluck('version', 'version');
         $form = new Form(new Tkbtns());
 
         $form->radio('type', __('类型'))->options(['1' => 'ID', '2'=> 'VIEM'])->default('1')->required();
-        $form->text('version', __('TikTok—版本'))->required();
+        $form->select('version', __('TikTok—版本'))->required()->options($tiktoks);
         $form->text('key', __('脚本端—KEY'))->required();
         $form->text('val', __('TikTok—ID/VIEM'))->required();
         $form->textarea('remark', __('备注'));

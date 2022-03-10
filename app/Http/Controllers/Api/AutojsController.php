@@ -111,7 +111,7 @@ class AutojsController extends Controller{
 	public function tiktokBtns(Request $request){
 		$token 		= $request->input('token');
 		if(!AdminUser::verfyToken($token)){
-			return response()->json(['code' => 500, 'msg' => '非法请求!', 'data' => $data]);
+			return response()->json(['code' => 500, 'msg' => '非法请求!', 'data' => '']);
 		}
 
 		$id 		= (int)$request->input('id');
