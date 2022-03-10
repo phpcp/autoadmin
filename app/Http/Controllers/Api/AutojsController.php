@@ -168,7 +168,7 @@ class AutojsController extends Controller{
         ];
         $tktxts 	= [];
 
-        foreach($tktxts as $item){
+        foreach($tktxtsObj as $item){
         	if($item->type == 1){
         		$closes['txt'][] 	= $item->val;
         	}else{
