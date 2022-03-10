@@ -7,6 +7,8 @@ use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Models\Tiktok;
+use App\Models\Tklang;
 
 class LangToTextsController extends AdminController
 {
@@ -56,9 +58,11 @@ class LangToTextsController extends AdminController
      */
     protected function form()
     {
+        $tiktoks    = Tiktok::pluck('version', 'version');
+        $tklangs    = Tklang::pluck('lang_text', 'iso');
         $form = new Form(new LangToText());
-        $form->text('lang', __('语言-ISO'))->required();
-        $form->text('version', __('TikTok—版本'));
+        $form->select('lang', __('语言-ISO'))->required()->options($tklangs);
+        $form->select('version', __('TikTok—版本'))->options($tiktoks);
         $form->text('key', __('脚本端—KEY'))->required();
         $form->text('val', __('TikTok—TEXT'))->required();
         $form->image('image', __('示例'));

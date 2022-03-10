@@ -12,6 +12,7 @@ use App\Models\Tiktok;
 use App\Models\Device;
 use App\Models\TiktokVersionButton;
 use App\Models\LangToText;
+use App\Models\Appversion;
 
 use App\Models\Tkbtns;
 class AutojsController extends Controller{
@@ -55,23 +56,35 @@ class AutojsController extends Controller{
 
 	// 脚本检查更新
 	public function version(Request $request){
-		$versionCode 	= $request->input('versionCode');
+		$versionCode 	= (int)$request->input('versionCode', 0);
 		$versionName 	= $request->input('versionName');
 		$token 			= $request->input('token');
 		if(!AdminUser::verfyToken($token)){
 			return response()->json(['code' => 500, 'msg' => '非法请求!', 'data' => $data]);
 		}
 
-		$data 			= [
-			'code' => 400,
-			'data' => [
-				'downloadurl' 	=> 'https://auto.mini.zhishukongjian.com/storage/app/dome_cat_1.0.0.apk',
-				'appname'		=> 'dome_cat_1.0.0.apk',
-				'remark' 		=> '新增tiktok最新版兼容',
-				'infourl' 		=> ''
-			],
-			'msg' => '发现新版本,是否更新?'
-		];
+		$lastVersion 	= Appversion::orderByDesc('id')->first();
+		if(!$lastVersion){
+			return Responses::error('暂无版本');
+		}
+		if($lastVersion->version > $versionCode){
+			$data 			= [
+				'code' => 200,
+				'data' => [
+					'downloadurl' 	=> $lastVersion->url,
+					'appname'		=> basename($lastVersion->url),
+					'remark' 		=> $lastVersion->remark,
+					'infourl' 		=> ''
+				],
+				'msg' => '发现新版本,是否更新?'
+			];
+		}else{
+			$data 			= [
+				'code' => 400,
+				'data' => [],
+				'msg' => '恭喜您已经升级到最新版'
+			];
+		}
 		return response()->json($data);
 	}
 
