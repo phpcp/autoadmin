@@ -1,17 +1,17 @@
 <li>
-    <a href="javascript:;" onclick="openDownload();">
-      <i class="fa fa-cloud-download"></i>
-      脚本下载
+    <a href="javascript:;" onclick="openDownTK();">
+      <i class="fa fa-cloud-music"></i>
+      Tiktok下载
     </a>
 </li>
 <script type="text/javascript">
 var url 	= '<?php echo route("resours"); ?>';
-function openDownload(){
+function openDownTK(){
 	layer.open({
 		type: 2,
 		area: ['336px', '450px'],
-		title: '最新版脚本下载',
-		content: url,
+		title: '最新版 TikTok 下载',
+		content: url + '?tt=tk',
 		shadeClose: true
 	});
 }

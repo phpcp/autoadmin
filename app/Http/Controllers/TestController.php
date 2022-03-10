@@ -19,6 +19,8 @@ use Nullix\CryptoJsAes\CryptoJsAes;
 
 use App\Globals\WbApi;
 use Encore\Admin\Facades\Admin;
+use App\Models\Appversion;
+use App\Models\Tiktok;
 use Illuminate\Support\Facades\Storage;
 
 class TestController extends Controller{
@@ -52,7 +54,7 @@ class TestController extends Controller{
     	// dd(Ens::decrypt($encryptToken));
     	// $data 		= json_encode($arr);
     	// $data 		= $encryptToken;
-    	echo $data;
+    	// echo $data;
 
 
 
@@ -179,9 +181,34 @@ class TestController extends Controller{
     }
 
     // 获取资源下载二维码
-    public function resours(){
-      return '<div style="text-align:center;"><img src="' . Storage::url('images/domeapk.png') . '" style="max-width:90%;"> <div>脚本软件下载</div></div>';
-      return '<div style="text-align:center;"><img src="' . Storage::url('images/domeapk.png') . '" style="max-width:90%;"> <div>脚本软件下载</div> <br><br> <img src="' . Storage::url('images/tiktok23.1.4.png') . '" style="max-width:90%;"> <div>tiktok下载</div> <br></div>';
+    public function resours(Request $request){
+      $tt     = $request->get('tt');
+      if($tt == 'tk'){
+        $last   = Tiktok::orderByDesc('id')->first();
+      }else{
+        $last   = Appversion::orderByDesc('id')->first();
+      }
+      if(!$last){
+        return '没有版本可下载';
+      }
+
+      $result = Builder::create()
+        ->writer(new PngWriter())
+        ->writerOptions([])
+        ->data(Storage::disk('admin')->url($last->url))
+        ->encoding(new Encoding('UTF-8'))
+        ->errorCorrectionLevel(new ErrorCorrectionLevelHigh())
+        ->size(300)
+        ->margin(10)
+        ->roundBlockSizeMode(new RoundBlockSizeModeMargin())
+        // ->logoPath(__DIR__.'/assets/symfony.png')
+        ->labelText('版本号: ' . $last->version)
+        ->labelFont(new NotoSans(20))
+        ->labelAlignment(new LabelAlignmentCenter())
+        ->build();
+    return '<img src="' . $result->getDataUri() . '" />';
+      // return '<div style="text-align:center;"><img src="' . Storage::url('images/domeapk.png') . '" style="max-width:90%;"> <div>脚本软件下载</div></div>';
+      // return '<div style="text-align:center;"><img src="' . Storage::url('images/domeapk.png') . '" style="max-width:90%;"> <div>脚本软件下载</div> <br><br> <img src="' . Storage::url('images/tiktok23.1.4.png') . '" style="max-width:90%;"> <div>tiktok下载</div> <br></div>';
     }
 }
 
