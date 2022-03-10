@@ -13,6 +13,7 @@ use App\Models\Device;
 use App\Models\TiktokVersionButton;
 use App\Models\LangToText;
 
+use App\Models\Tkbtns;
 class AutojsController extends Controller{
 	// 登录脚本
 	public function auth(Request $request){
@@ -130,22 +131,38 @@ class AutojsController extends Controller{
 		if(!$rs->soft_version || !$rs->soft_lang){
 			return Responses::error('请在后台设置tiktok版本号和使用语言!', null, 500, 200);
 		}
-		$tmp 		= TiktokVersionButton::where('version', $rs->soft_version)->first();
-		if(!$tmp || !$tmp->ids){
+		// $tmp 		= TiktokVersionButton::where('version', $rs->soft_version)->first();
+		// if(!$tmp || !$tmp->ids){
+		// 	return Responses::error('Tiktok版本 ' . $rs->soft_version . ' 目前不支持!', null, 500, 200);
+		// }
+		// $tkids 		= json_decode($tmp->ids, true);
+		$tmp  = Tkbtns::where('status', 1)->where('version', $rs->soft_version)->select('key','val','type')->get()->toArray();
+		if( empty($tmp)){
 			return Responses::error('Tiktok版本 ' . $rs->soft_version . ' 目前不支持!', null, 500, 200);
 		}
-		$tkids 		= json_decode($tmp->ids, true);
+		
 		$tktxts 	= LangToText::where('lang', $rs->soft_lang)->where(function($query) use($rs){
 			$query->whereRaw('version is null')->orWhere('version', $rs->soft_version);
 		})->orderBy('version', 'asc')->pluck('val', 'key')->toArray();
 
+		
+		$tkids  = [];
+        $view = [];
+        foreach ($tmp as $key => $value) {
+            if( $value['type'] == 1 ){
+                $tkids[$value['key']] = $value['val'];
+            }else if($value['type'] == 2){
+                $view[$value['key']] = $value['val'];
+            }
+        }
 		$data 		= [
 			'buttonId'		=> $tkids,
 			'buttonText'	=> $tktxts,
 			'basicInfo'		=> ['appName' => 'TikTok'],
-			'view'			=> [
-				'home' => 'com.ss.android.ugc.aweme.main.MainActivity'
-			],
+			// 'view'			=> [
+			// 	'home' => 'com.ss.android.ugc.aweme.main.MainActivity'
+			// ],
+			'view'			=> $view,
 			'tiktok_close'	=> [],
 		];
 		return response()->json(['code' => 200, 'msg' => '', 'data' => $data]);
