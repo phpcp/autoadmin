@@ -9,4 +9,5 @@ class Tkbtns extends Model
 {
 	public $timestamps = false;
     use HasFactory;
+    public static $types    = ['1' => 'ID', '2' => 'VIEM', 3 => '弹窗关闭按钮'];
 }

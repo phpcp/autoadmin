@@ -28,7 +28,7 @@ class TkbtnsController extends AdminController
         $grid = new Grid(new Tkbtns());
         $tiktoks    = Tiktok::pluck('version', 'version');
         $grid->column('id', __('Id'))->hide();
-        $grid->column('type', __('类型'))->using(['1' => 'ID', '2' => 'VIEM']);
+        $grid->column('type', __('类型'))->using(Tkbtns::$types);
         $grid->column('version', __('TikTok—版本'));
         $grid->column('key', __('脚本端—KEY'));
         $grid->column('val', __('TikTok—ID/VIEM'));
@@ -75,7 +75,7 @@ class TkbtnsController extends AdminController
         $tiktoks    = Tiktok::pluck('version', 'version');
         $form = new Form(new Tkbtns());
 
-        $form->radio('type', __('类型'))->options(['1' => 'ID', '2'=> 'VIEM'])->default('1')->required();
+        $form->radio('type', __('类型'))->options(Tkbtns::$types)->default('1')->required();
         $form->select('version', __('TikTok—版本'))->required()->options($tiktoks);
         $form->text('key', __('脚本端—KEY'))->required();
         $form->text('val', __('TikTok—ID/VIEM'))->required();
