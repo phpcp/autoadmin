@@ -63,7 +63,7 @@ class TiktokversionsController extends AdminController
 
         $form->text('version', __('版本号'));
         $form->textarea('remark', __('备注'));
-        $form->file('url', __('Tiktok安装包'));
+        $form->file('url', __('Tiktok安装包'))->move('apps');
 
         return $form;
     }
