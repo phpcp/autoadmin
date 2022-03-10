@@ -31,12 +31,13 @@ class TkbtnsController extends AdminController
         $grid->column('key', __('脚本端—KEY'));
         $grid->column('val', __('TikTok—ID/VIEM'));
         $grid->column('remark', __('备注'));
+
+        $grid->column('image', __('示例'))->image();
         $states = [
             'on'  => ['value' => 1, 'text' => '正常', 'color' => 'primary'],
             'off' => ['value' => 2, 'text' => '禁用', 'color' => 'default'],
         ];
         $grid->column('status', __('状态'))->switch($states)->sortable();
-
         $grid->filter(function($filter){
             // 去掉默认的id过滤器
             $filter->disableIdFilter();
@@ -62,29 +63,6 @@ class TkbtnsController extends AdminController
         });
         return $grid;
     }
-
-    /**
-     * Make a show builder.
-     *
-     * @param mixed $id
-     * @return Show
-     */
-    protected function detail($id)
-    {
-        $show = new Show(Tkbtns::findOrFail($id));
-        $show->field('id', __('Id'));
-        $show->field('name', __('Name'));
-        $show->field('email', __('Email'));
-        $show->field('email_verified_at', __('Email verified at'));
-        $show->field('password', __('Password'));
-        $show->field('remember_token', __('Remember token'));
-        $show->field('max_device', __('Max device'));
-        $show->field('endtime', __('Endtime'));
-        $show->field('created_at', __('Created at'));
-        $show->field('updated_at', __('Updated at'));
-
-        return $show;
-    }
     /**
      * Make a form builder.
      *
@@ -100,7 +78,7 @@ class TkbtnsController extends AdminController
         $form->text('val', __('TikTok—ID/VIEM'))->required();
         $form->textarea('remark', __('备注'));
         $form->radio('status', __('状态'))->options(['1' => '正常', '2'=> '禁用'])->default('1')->required();
-
+        $form->image('image', __('示例'));
         $form->tools(function (Form\Tools $tools) {
             $tools->disableDelete();
             $tools->disableView();
