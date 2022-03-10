@@ -55,6 +55,7 @@ Route::group([
 	Route::post('/topcaccounts', 'PublicController@topcaccounts')->name('topcaccounts');
 	Route::post('/uploaded', 'PublicController@uploaded')->name('uploaded');
 	Route::post('/start', 'PublicController@start')->name('start');
+	Route::post('/signle', 'PublicController@signle')->name('signle');
 
 	Route::post('/accounts', 'DevicesController@accounts')->name('accounts');
 	Route::post('/getbyid/{id}', 'PublicController@getbyid')->name('getbyid')->where('id', '[0-9]+');
