@@ -11,6 +11,8 @@ use App\Models\Account;
 use App\Models\GroupDevice;
 use App\Models\DeviceToGroup;
 use App\Models\LangToText;
+use App\Models\Tklang;
+use App\Models\Tiktok;
 use App\Models\TiktokVersionButton;
 use Encore\Admin\Widgets\Table;
 use Encore\Admin\Facades\Admin;
@@ -47,9 +49,11 @@ class DevicesController extends AdminController
         $rs         = $rs['dids'] ?? null;
         $dids       = [];
 
-        $allowerLangs   = LangToText::select('lang')->groupBy('lang')->pluck('lang', 'lang')->toArray();
-        $allowerVers    = TiktokVersionButton::select('version')->groupBy('version')->pluck('version', 'version')->toArray();
+        // $allowerLangs   = LangToText::select('lang')->groupBy('lang')->pluck('lang', 'lang')->toArray();
+        // $allowerVers    = TiktokVersionButton::select('version')->groupBy('version')->pluck('version', 'version')->toArray();
         // dd($allowerVers);
+        $allowerLangs   = Tklang::pluck('lang_text', 'iso')->toArray();
+        $allowerVers    = Tiktok::pluck('version', 'version')->toArray();
 
         $groups     = GroupDevice::where('admin_id', $uid)->pluck('name', 'id')->toArray();
         // $myDeviceGroups     = Group::where('admin_id', $uid)->where('type', 0);
