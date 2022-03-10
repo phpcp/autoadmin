@@ -74,6 +74,9 @@ class TaskType extends Model{
     		return '未发现账号!';
     	}
 
+        if(isset($arr['data']['configs']['commants'])){
+            $arr['data']['configs']['commants']     = explode("\r\n", $arr['data']['configs']['commants']);
+        }
     	$sendArr 		= [];
     	foreach($accountObj as $item){
     		$sendArr[$item['did']][$item['id']] 	= $item['unique_id'];//$item['nickname'];
