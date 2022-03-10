@@ -26,7 +26,6 @@ class TkbtnsController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new Tkbtns());
-        $tiktoks    = Tiktok::pluck('version', 'version');
         $grid->column('id', __('Id'))->hide();
         $grid->column('type', __('类型'))->using(Tkbtns::$types);
         $grid->column('version', __('TikTok—版本'));

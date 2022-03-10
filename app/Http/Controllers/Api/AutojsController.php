@@ -154,18 +154,34 @@ class AutojsController extends Controller{
 			return Responses::error('Tiktok版本 ' . $rs->soft_version . ' 目前不支持!', null, 500, 200);
 		}
 		
-		$tktxts 	= LangToText::where('lang', $rs->soft_lang)->where(function($query) use($rs){
+		$tktxtsObj 	= LangToText::where('lang', $rs->soft_lang)->where(function($query) use($rs){
 			$query->whereRaw('version is null')->orWhere('version', $rs->soft_version);
-		})->orderBy('version', 'asc')->pluck('val', 'key')->toArray();
+		})->orderBy('version', 'asc')->get();//->pluck('val', 'key')->toArray();
 
 		
-		$tkids  = [];
-        $view = [];
+		$tkids  	= [];
+        $view 		= [];
+        $closes		= [
+        	'id'	=> [],
+        	'txt'	=> [],
+        ];
+        $tktxts 	= [];
+
+        foreach($tktxts as $item){
+        	if($item->type == 1){
+        		$closes['txt'][] 	= $item->val;
+        	}else{
+        		$tktxts[$item->key]	= $item->val;
+        	}
+        }
+
         foreach ($tmp as $key => $value) {
             if( $value['type'] == 1 ){
-                $tkids[$value['key']] = $value['val'];
+                $tkids[$value['key']] 	= $value['val'];
             }else if($value['type'] == 2){
-                $view[$value['key']] = $value['val'];
+                $view[$value['key']] 	= $value['val'];
+            }elseif($value['type'] == 3){
+            	$closes['id'][] 		= $value['val'];
             }
         }
 		$data 		= [
@@ -176,7 +192,7 @@ class AutojsController extends Controller{
 			// 	'home' => 'com.ss.android.ugc.aweme.main.MainActivity'
 			// ],
 			'view'			=> $view,
-			'tiktok_close'	=> [],
+			'tiktok_close'	=> $closes,
 		];
 		return response()->json(['code' => 200, 'msg' => '', 'data' => $data]);
 	}

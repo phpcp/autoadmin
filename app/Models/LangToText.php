@@ -9,4 +9,5 @@ class LangToText extends Model
 {
 	public $timestamps = false;
     use HasFactory;
+    public static $types    = [0 => '脚本', 1 => '弹窗'];
 }

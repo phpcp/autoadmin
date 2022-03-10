@@ -32,6 +32,7 @@ class LangToTextsController extends AdminController
         $grid->column('lang', __('语言-ISO'));
         $grid->column('key', __('脚本端—KEY'));
         $grid->column('val', __('TikTok—TEXT'));
+        $grid->column('type', __('类型'))->using(LangToText::$types);
         $grid->column('image', __('示例'))->image();
         $grid->filter(function($filter){
             // 去掉默认的id过滤器
@@ -61,6 +62,7 @@ class LangToTextsController extends AdminController
         $tiktoks    = Tiktok::pluck('version', 'version');
         $tklangs    = Tklang::pluck('lang_text', 'iso');
         $form = new Form(new LangToText());
+        $form->radio('type', __('类型'))->options(LangToText::$types)->default(0);
         $form->select('lang', __('语言-ISO'))->required()->options($tklangs);
         $form->select('version', __('TikTok—版本'))->options($tiktoks);
         $form->text('key', __('脚本端—KEY'))->required();
