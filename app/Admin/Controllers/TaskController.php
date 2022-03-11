@@ -77,7 +77,7 @@ class TaskController extends AdminController
         // $grid->column('endtime', __('结束时间'))->sortable();
         $grid->column('configs', __('配置'))->hide();
         $grid->column('errmsg', __('错误信息'))->hide();
-        // $grid->column('status', __('任务状态'))->using(Task::$status)->label($labels);
+        $grid->column('status', __('任务状态'))->using(Task::$status)->label($labels);
         // $grid->column('active', __('是否有效'))->switch($states);
         $grid->column('media_num', __('单次视频发布数量'))->display(function ($media_num) {
             return $media_num == 0?'---':$media_num;
@@ -239,6 +239,7 @@ class TaskController extends AdminController
                 }
                 $form->account_id   = $accounts;
             }
+            $form->model()->status   = 0;
         });
 
         // $form->saved(function (Form $form) {

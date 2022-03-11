@@ -153,9 +153,9 @@ class DevicesController extends AdminController
             }
         })->sortable();
 
-        $grid->column('task', __('当前任务'))->display(function(){
-            return '暂无任务';
-        });
+        // $grid->column('task', __('当前任务'))->display(function(){
+        //     return '暂无任务';
+        // });
         // $grid->column('updated_at', __('Updated at'));
         $grid->disableActions();
         $grid->batchActions(function ($batch) {

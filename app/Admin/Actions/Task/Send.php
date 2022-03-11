@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\TaskType;
 use App\Models\Device;
 use App\Models\Account;
+use App\Models\Task;
 use Illuminate\Support\MessageBag;
 use App\Globals\WbApi;
 use Encore\Admin\Facades\Admin;
@@ -74,6 +75,9 @@ class Send extends RowAction
                     // return back()->with(compact('error'));
                 }
             }else{
+                $task           = Task::find($form->id);
+                $task->status   = 0;
+                $task->save();
                 $rs     = WbApi::send(Admin::user()->id, implode(',', $devicesId), $arr);
                 if($rs){
 	                $rs     = json_decode($rs, true);

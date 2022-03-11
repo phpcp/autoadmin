@@ -68,4 +68,8 @@ Route::group([
 	Route::post('/authv2', 'AutojsController@auth')->name('authv2');
 	Route::post('/tkdts', 'AutojsController@tiktokBtns')->name('tkdts');
 	Route::post('/changedevicenum', 'AutojsController@changedevicenum')->name('changedevicenum');
+
+
+	Route::post('/raise', 'AutojsbackController@raise')->name('raise');
+	Route::post('/post', 'AutojsbackController@post')->name('post');
 });
