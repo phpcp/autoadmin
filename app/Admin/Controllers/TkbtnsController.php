@@ -33,7 +33,7 @@ class TkbtnsController extends AdminController
         $grid->column('val', __('TikTok—ID/VIEM'));
         $grid->column('remark', __('备注'));
 
-        $grid->column('image', __('示例'))->image();
+        $grid->column('image', __('示例'))->image()->hide();
         $states = [
             'on'  => ['value' => 1, 'text' => '正常', 'color' => 'primary'],
             'off' => ['value' => 2, 'text' => '禁用', 'color' => 'default'],
