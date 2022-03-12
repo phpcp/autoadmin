@@ -40,7 +40,7 @@ class TaskType extends Model{
             $acarr[$acr['did']][]      = [
                 'uuid'      => $acr['uuid'],
                 'media'     => Storage::disk('admin')->url($media),
-                'commant'   => $commants[$index] ?? null,
+                'commant'   => $commants[$index] ?? [],
             ];
             $i++;
         }
