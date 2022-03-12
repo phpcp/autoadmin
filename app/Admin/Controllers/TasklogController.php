@@ -2,7 +2,7 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\Tasklog;
+use App\Models\TaskLog;
 use App\Models\TaskType;
 use App\Models\Device;
 use App\Models\Task;
