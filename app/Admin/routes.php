@@ -30,4 +30,5 @@ Route::group([
     $router->resource('tklangs', TklangController::class);
     $router->resource('appversions', AppversionsController::class);
     $router->resource('tiktoks', TiktokversionsController::class);
+    $router->resource('tasklogs', TasklogController::class);
 });
