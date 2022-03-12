@@ -40,7 +40,7 @@ class TaskType extends Model{
             $acarr[$acr['did']][]      = [
                 'uuid'      => $acr['uuid'],
                 'media'     => Storage::disk('admin')->url($media),
-                'commant'   => $commants[$index] ?? [],
+                'commant'   => $commants[$index] ?? null,
             ];
             $i++;
         }
@@ -76,6 +76,8 @@ class TaskType extends Model{
 
         if(isset($arr['data']['configs']['commants'])){
             $arr['data']['configs']['commants']     = explode("\r\n", $arr['data']['configs']['commants']);
+        }else{
+            $arr['data']['configs']['commants']     = [];
         }
     	$sendArr 		= [];
     	foreach($accountObj as $item){
