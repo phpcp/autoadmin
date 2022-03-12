@@ -52,8 +52,8 @@ class TaskLog extends Model{
 			$task_log->task_type	= $task->task_id;
 			$task_log->task_qty 	= $task->quality;
 			$task_log->remark		= $remark;
-			if(isset($res['data']['data'])){
-				$task_log->origin 		= json_encode($res['data']['data']);
+			if(isset($res['data'])){
+				$task_log->origin 		= json_encode($res['data']);
 			}
 			$task_log->addtime		= time();
 			if($task_log->save()){
