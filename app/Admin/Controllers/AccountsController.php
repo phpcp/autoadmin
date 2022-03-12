@@ -137,21 +137,21 @@ class AccountsController extends AdminController
      */
     protected function detail($id)
     {
-        $show = new Show(Account::findOrFail($id));
+        // $show = new Show(Account::findOrFail($id));
 
-        $show->field('id', __('Id'));
-        $show->field('did', __('Did'));
-        $show->field('uuid', __('Uuid'));
-        $show->field('avatar', __('Avatar'));
-        $show->field('username', __('Username'));
-        $show->field('fensi', __('Fensi'));
-        $show->field('zuopin', __('Zuopin'));
-        $show->field('dianzan', __('Dianzan'));
-        $show->field('guanzhu', __('Guanzhu'));
-        $show->field('updated_at', __('Updated at'));
-        $show->field('created_at', __('Created at'));
+        // $show->field('id', __('Id'));
+        // $show->field('did', __('Did'));
+        // $show->field('uuid', __('Uuid'));
+        // $show->field('avatar', __('Avatar'));
+        // $show->field('username', __('Username'));
+        // $show->field('fensi', __('Fensi'));
+        // $show->field('zuopin', __('Zuopin'));
+        // $show->field('dianzan', __('Dianzan'));
+        // $show->field('guanzhu', __('Guanzhu'));
+        // $show->field('updated_at', __('Updated at'));
+        // $show->field('created_at', __('Created at'));
 
-        return $show;
+        // return $show;
     }
 
     /**
@@ -161,30 +161,30 @@ class AccountsController extends AdminController
      */
     protected function form()
     {
-        $form = new Form(new Account());
+        // $form = new Form(new Account());
 
-        // $form->number('did', __('Did'));
-        // $form->text('uuid', __('Uuid'));
-        // $form->image('avatar', __('Avatar'));
-        $form->number('groups', __('所属组'));
-        // $form->text('username', __('Username'));
-        // $form->number('fensi', __('Fensi'));
-        // $form->number('zuopin', __('Zuopin'));
-        // $form->number('dianzan', __('Dianzan'));
-        // $form->number('guanzhu', __('Guanzhu'));
-        $form->saved(function(Form $form){
-            AccountToGroup::where('id', $form->model()->id)->delete();
-            $arr    = [];
-            if($form->groups){
-                foreach($form->groups as $item){
-                    $arr[]  = ['id' => $form->model()->id, 'gid' => $item];
-                }
-                AccountToGroup::insert($arr);
-            }
-            Gpac::countAccount(Admin::user()->id);
-            // DB::table('group_accounts')->countAccount(Admin::user()->id);
-        });
+        // // $form->number('did', __('Did'));
+        // // $form->text('uuid', __('Uuid'));
+        // // $form->image('avatar', __('Avatar'));
+        // $form->number('groups', __('所属组'));
+        // // $form->text('username', __('Username'));
+        // // $form->number('fensi', __('Fensi'));
+        // // $form->number('zuopin', __('Zuopin'));
+        // // $form->number('dianzan', __('Dianzan'));
+        // // $form->number('guanzhu', __('Guanzhu'));
+        // $form->saved(function(Form $form){
+        //     AccountToGroup::where('id', $form->model()->id)->delete();
+        //     $arr    = [];
+        //     if($form->groups){
+        //         foreach($form->groups as $item){
+        //             $arr[]  = ['id' => $form->model()->id, 'gid' => $item];
+        //         }
+        //         AccountToGroup::insert($arr);
+        //     }
+        //     Gpac::countAccount(Admin::user()->id);
+        //     // DB::table('group_accounts')->countAccount(Admin::user()->id);
+        // });
 
-        return $form;
+        // return $form;
     }
 }

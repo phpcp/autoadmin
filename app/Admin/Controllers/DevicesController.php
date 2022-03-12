@@ -38,25 +38,16 @@ class DevicesController extends AdminController
             'off' => ['value' => 0, 'text' => '关闭', 'color' => 'default'],
         ];
 
-// $tktxts     = LangToText::where('lang', 'english')->where(function($query){
-//             $query->whereRaw('version is null')->orWhere('version', '22.6.4');
-//         })->orderBy('version', 'asc')->pluck('val', 'key')->toArray();
-// dd($tktxts);
-
         $uid        = Admin::user()->id;
         $rs         = WbApi::Send($uid, '', '', 'status');
         $rs         = json_decode($rs, true);
         $rs         = $rs['dids'] ?? null;
         $dids       = [];
 
-        // $allowerLangs   = LangToText::select('lang')->groupBy('lang')->pluck('lang', 'lang')->toArray();
-        // $allowerVers    = TiktokVersionButton::select('version')->groupBy('version')->pluck('version', 'version')->toArray();
-        // dd($allowerVers);
         $allowerLangs   = Tklang::pluck('lang_text', 'iso')->toArray();
         $allowerVers    = Tiktok::pluck('version', 'version')->toArray();
 
         $groups     = GroupDevice::where('admin_id', $uid)->pluck('name', 'id')->toArray();
-        // $myDeviceGroups     = Group::where('admin_id', $uid)->where('type', 0);
 
         if($rs){
             $dids   = explode(',', $rs);
