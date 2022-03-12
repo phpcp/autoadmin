@@ -57,7 +57,6 @@ Route::group([
 	Route::post('/start', 'PublicController@start')->name('start');
 	Route::post('/signle', 'PublicController@signle')->name('signle');
 
-	Route::post('/accounts', 'DevicesController@accounts')->name('accounts');
 	Route::post('/getbyid/{id}', 'PublicController@getbyid')->name('getbyid')->where('id', '[0-9]+');
 	//接收任务结果
 	Route::post('/receiveTaskRes', 'TasksController@receiveTaskRes')->name('receiveTaskRes');
@@ -70,6 +69,7 @@ Route::group([
 	Route::post('/changedevicenum', 'AutojsController@changedevicenum')->name('changedevicenum');
 
 
+	Route::post('/accounts', 'DevicesController@accounts')->name('accounts');
 	Route::post('/raise', 'AutojsbackController@raise')->name('raise');
 	Route::post('/post', 'AutojsbackController@post')->name('post');
 });

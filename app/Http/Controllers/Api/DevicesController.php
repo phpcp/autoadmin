@@ -68,6 +68,9 @@ class DevicesController extends Controller{
         }
         $resuData   = $data['data'];
         foreach($resuData as $item){
+            if(!isset($item['uid'])){
+                continue;
+            }
             $uid    = $item['uid'];
             $row    = Account::where('admin_id', $adminid)->where('uid', $uid)->first();
             if(!$row){
