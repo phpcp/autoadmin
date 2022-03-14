@@ -188,8 +188,12 @@ class TaskController extends AdminController
             $form->multipleSelect('account_id', __('账号列表'))->options($accounts);
             $form->multipleFile('medias', __('视频'))->removable()->sortable();
             $form->textarea('commant', __('视频标题'))->placeholder('和视频顺序对应,如果不需要文案,则留空行')->rows(14);
-        })->when(4, function(Form $form){// 关注
-            $form->html('待开发...');
+        })->when(4, function(Form $form) use($devices, $accounts, $deviceGroups, $accountGroups){// 关注
+            $form->number('media_num', __('关注总数'))->min(1)->default(10);
+            $form->multipleSelect('dg', __('设备组'))->options($deviceGroups);
+            $form->multipleSelect('device_id', __('手机设备'))->options($devices);
+            $form->multipleSelect('ag', __('账号组'))->options($accountGroups);
+            $form->multipleSelect('account_id', __('账号列表'))->options($accounts);
         });
 
 

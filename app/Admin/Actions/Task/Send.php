@@ -45,20 +45,22 @@ class Send extends RowAction
             }
 
             if(!$tskType){
-                $error = new MessageBag([
-                    'title'   => '错误',
-                    'message' => '请选择任务类型!',
-                ]);
-                return back()->with(compact('error'));
+                return $this->response()->error('请选择任务类型!')->refresh();
+                // $error = new MessageBag([
+                //     'title'   => '错误',
+                //     'message' => '请选择任务类型!',
+                // ]);
+                // return back()->with(compact('error'));
             }
             // 除了基于设备的任务,其余的都是基于账号的任务
             if($tskType->isdevice != 1){
                 if(!$accountsId){
-                    $error = new MessageBag([
-                        'title'   => '错误',
-                        'message' => '当前任务设置没有账号!',
-                    ]);
-                    return back()->with(compact('error'));
+                    return $this->response()->error('当前任务设置没有账号!')->refresh();
+                    // $error = new MessageBag([
+                    //     'title'   => '错误',
+                    //     'message' => '当前任务设置没有账号!',
+                    // ]);
+                    // return back()->with(compact('error'));
                 }
             }
             // 将配置按设备区分,并带上账号信息

@@ -32,7 +32,8 @@ class AutojsbackController extends Controller{
 					return '未捕获到任务状态!' . $e->getMessage();
 				}
 			}else{
-				return '任务开始';
+				$msg 	= isset($data['msg']) && $data['msg'] ? $data['msg'] : '开始任务';
+				return $msg;
 			}
 		});
 		if($rs == false){
@@ -67,7 +68,8 @@ class AutojsbackController extends Controller{
 					return '获取数据失败!' . $e->getMessage();
 				}
 			}else{
-				return '任务开始';
+				$msg 	= isset($data['msg']) && $data['msg'] ? $data['msg'] : '开始任务';
+				return $msg;
 			}
 		});
 		if($rs == false){

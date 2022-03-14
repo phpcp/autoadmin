@@ -61,7 +61,7 @@ class AutojsController extends Controller{
 		$versionName 	= $request->input('versionName');
 		$token 			= $request->input('token');
 		if(!AdminUser::verfyToken($token)){
-			return response()->json(['code' => 500, 'msg' => '非法请求!', 'data' => $data]);
+			return response()->json(['code' => 401, 'msg' => '请先登录!', 'data' => []]);
 		}
 
 		$lastVersion 	= Appversion::orderByDesc('id')->first();
@@ -94,7 +94,7 @@ class AutojsController extends Controller{
 		$nowVersion 	= $request->input('tkversion');
 		$token 			= $request->input('token');
 		if(!AdminUser::verfyToken($token)){
-			return response()->json(['code' => 500, 'msg' => '非法请求!', 'data' => $data]);
+			return response()->json(['code' => 401, 'msg' => '请先登录!', 'data' => []]);
 		}
 
 		$last 			= Tiktok::last();
@@ -105,7 +105,7 @@ class AutojsController extends Controller{
 		$data 			= [
 			'code' => 400,
 			'data' => [],
-			'msg' => '暂无更新!'
+			'msg' => "版本暂无更新!\r\n如版本不匹配,脚本将无法正常运行.如果因tiktok版本问题导致脚本无法正常运行,请在后台下载最新版,并设置对应设备tiktok版本!",
 		];
 		if($nowVersion < $last->version){
 			$data['code']	= 200;
@@ -125,7 +125,7 @@ class AutojsController extends Controller{
 	public function tiktokBtns(Request $request){
 		$token 		= $request->input('token');
 		if(!AdminUser::verfyToken($token)){
-			return response()->json(['code' => 500, 'msg' => '非法请求!', 'data' => '']);
+			return response()->json(['code' => 401, 'msg' => '请先登录!', 'data' => '']);
 		}
 
 		$id 		= (int)$request->input('id');
@@ -205,7 +205,7 @@ class AutojsController extends Controller{
 		$did 	= $request->input('id');
 
 		if(!AdminUser::verfyToken($token)){
-			return response()->json(['code' => 500, 'msg' => '非法请求!', 'data' => '']);
+			return response()->json(['code' => 401, 'msg' => '请先登录!', 'data' => '']);
 		}
 		$device 	= Device::find($did);
 		if(!$device){
