@@ -67,9 +67,25 @@ Route::group([
 	Route::post('/authv2', 'AutojsController@auth')->name('authv2');
 	Route::post('/tkdts', 'AutojsController@tiktokBtns')->name('tkdts');
 	Route::post('/changedevicenum', 'AutojsController@changedevicenum')->name('changedevicenum');
+	Route::post('/whereisme', 'AutojsController@whereisme')->name('whereisme');
 
 
-	Route::post('/accounts', 'DevicesController@accounts')->name('accounts');
+	Route::post('/accounts', 'AutojsbackController@accounts')->name('accounts');
 	Route::post('/raise', 'AutojsbackController@raise')->name('raise');
 	Route::post('/post', 'AutojsbackController@post')->name('post');
+
+
+	// PC端
+	Route::group([
+		'prefix'		=> 'pc/',
+		'name'			=> 'pc.'
+	],function(){
+		Route::post('/index', 'PcController@index')->name('index');
+		Route::post('/login', 'PcController@login')->name('login');
+		Route::group([
+			'middleware'    => ['jwt'],
+		],function(){
+			Route::post('/info', 'PcController@info')->name('info');
+		});
+	});
 });

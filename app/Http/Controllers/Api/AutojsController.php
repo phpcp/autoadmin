@@ -15,6 +15,7 @@ use App\Models\LangToText;
 use App\Models\Appversion;
 use Illuminate\Support\Facades\Storage;
 
+
 use App\Models\Tkbtns;
 class AutojsController extends Controller{
 	// 登录脚本
@@ -75,7 +76,7 @@ class AutojsController extends Controller{
 					'downloadurl' 	=> Storage::disk('admin')->url($lastVersion->url),
 					'appname'		=> basename($lastVersion->url),
 					'remark' 		=> $lastVersion->remark,
-					'infourl' 		=> ''
+					'infourl' 		=> '',
 				],
 				'msg' => '发现新版本,是否更新?'
 			];
@@ -219,5 +220,31 @@ class AutojsController extends Controller{
 			return response()->json(['code' => 200, 'msg' => '修改成功!', 'data' => ['number' => $device->user_num]]);
 		}
 		return response()->json(['code' => 500, 'msg' => '系统错误!', 'data' => '']);
+	}
+
+	//获取当前设备ip
+	public function whereisme(Request $request){
+		$ip 		= $request->getClientIp();
+
+		// $client 	= new \GuzzleHttp\Client();
+		// $headers 	= [
+		// 	'content-type' 		=> 'application/x-www-form-urlencoded; charset=UTF-8',
+		// 	'origin' 			=> 'https://tool.lu',
+		// 	'referer' 			=> 'https://tool.lu/ip/',
+		// 	'accept-language'	=> 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7',
+		// 	'cookie'			=> 'uuid=c0429121-4a8d-4df9-b61c-e788fa556858; Hm_lvt_0fba23df1ee7ec49af558fb29456f532=1645604307,1646301747,1646913300,1647325976; _session=%7B%22slim.flash%22%3A%5B%5D%7D; Hm_lpvt_0fba23df1ee7ec49af558fb29456f532=1647329750; _access=449db14b81cbc95dc8f519abc490e3dc357b2e3bd5df221cca54792cf45c093d',
+		// ];
+		// $body 		= [
+		// 	'ip'	=> '104.144.116.176',
+		// ];
+		// $response 	= $client->post($getUrl, $headers, json_encode($body));
+		// dd($response);
+
+		$arr 		= [
+			'ip'		=> $ip,
+			'location'	=> '功能完善中...'
+		];
+		// return Responses::error('错误!');
+		return Responses::success($arr, '更新成功!');
 	}
 }

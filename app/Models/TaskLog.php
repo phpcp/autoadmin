@@ -70,8 +70,8 @@ class TaskLog extends Model{
     		if(!$res){
     			return false;
     		}
-    		return self::todb($res, $callback($res['data']));
-    	} catch (Exception $e) {
+    		return self::todb($res, $callback($res['data'], $res['uid'], $res['did']));
+    	} catch (\Exception $e) {
     		return false;
     	}
     }
