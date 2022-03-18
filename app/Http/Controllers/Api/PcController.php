@@ -44,4 +44,26 @@ class PcController extends Controller{
 		$arr['token']		= Jwt::token($arr);
 		return Responses::success($arr);
 	}
+
+	//下载pc端模板文件
+	public function reses(Request $request){
+
+	}
+
+	//返回菜单js文件
+	public function pcmenu(Request $request){
+		$uid 		= $request->get('_uid');
+		$jsFile 	= file_get_contents(__DIR__ . '/menu.js');
+		$arr 		= json_decode($jsFile, true);
+		$arr['menuInfo']	= [
+			[
+				"title" 	=> "常规管理",
+	            "icon"		=> "fa fa-address-book",
+	            "href"		=> "",
+	            "target"	=> "_self",
+			]
+		];
+		// header('Content-Type:application/json; charset=utf-8');
+		exit(json_encode($arr));
+	}
 }

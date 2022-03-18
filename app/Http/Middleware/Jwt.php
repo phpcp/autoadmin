@@ -20,7 +20,11 @@ class Jwt{
      */
     public function handle(Request $request, Closure $next){
         try{
-            $jwt        = JJWT::untoken($request->input('token'));
+            $token      = $request->header('authorization');
+            if(!$token){
+                $token  = $request->input('token');
+            }
+            $jwt        = JJWT::untoken($token);
             if($jwt instanceof Plain){
                 $id         = $jwt->claims()->get('id');
                 if($id > 0){
