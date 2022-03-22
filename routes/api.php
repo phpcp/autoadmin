@@ -85,8 +85,8 @@ Route::group([
 		Route::group([
 			'middleware'    => ['jwt'],
 		],function(){
-			Route::post('/info', 'PcController@info')->name('info');
-			Route::get('/menu', 'PcController@pcmenu')->name('menu');
+			Route::post('info', 'PcController@info')->name('info');
+			Route::post('menu', 'PcController@pcmenu')->name('menu');
 		});
 	});
 });
