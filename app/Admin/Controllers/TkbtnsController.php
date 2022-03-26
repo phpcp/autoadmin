@@ -8,6 +8,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Models\Tiktok;
+use App\Models\TiktokPage;
 
 class TkbtnsController extends AdminController
 {
@@ -16,7 +17,7 @@ class TkbtnsController extends AdminController
      *
      * @var string
      */
-    protected $title = 'TikTok参数';
+    protected $title = 'TikTok按钮管理';
 
     /**
      * Make a grid builder.
@@ -29,6 +30,7 @@ class TkbtnsController extends AdminController
         $grid->column('id', __('Id'))->hide();
         $grid->column('type', __('类型'))->using(Tkbtns::$types);
         $grid->column('version', __('TikTok—版本'));
+        $grid->column('tk_pages', __('TikTok—页面'));
         $grid->column('key', __('脚本端—KEY'));
         $grid->column('val', __('TikTok—ID/VIEM'));
         $grid->column('remark', __('备注'));
@@ -46,6 +48,7 @@ class TkbtnsController extends AdminController
                 $filter->equal('type', __('类型'))->radio([
                     1 => 'ID',
                     2 => 'VIEM',
+                    3 =>    '弹窗关闭按钮'
                 ]);
                 $filter->equal('status', __('状态'))->radio([
                     1 => '正常',
@@ -54,6 +57,7 @@ class TkbtnsController extends AdminController
                 $filter->like('varsion', __('TikTok—版本'));
             });
             $filter->column(1/2, function ($filter) {
+                $filter->like('tk_pages', __('TikTok—页面'));
                 $filter->like('key', __('脚本端—KEY'));
                 $filter->like('val', __('TikTok—ID/VIEM'));
             });
@@ -72,10 +76,12 @@ class TkbtnsController extends AdminController
     protected function form()
     {
         $tiktoks    = Tiktok::pluck('version', 'version');
+        $tiktokPage    = TiktokPage::where('status',1)->pluck('name', 'name');
         $form = new Form(new Tkbtns());
 
         $form->radio('type', __('类型'))->options(Tkbtns::$types)->default('1')->required();
-        $form->select('version', __('TikTok—版本'))->required()->options($tiktoks);
+        $form->select('version', __('TikTok—版本'))->options($tiktoks);
+        $form->select('tk_pages', __('TikTok—页面'))->options($tiktokPage);
         $form->text('key', __('脚本端—KEY'))->required();
         $form->text('val', __('TikTok—ID/VIEM'))->required();
         $form->textarea('remark', __('备注'));

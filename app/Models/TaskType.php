@@ -102,4 +102,39 @@ class TaskType extends Model{
     	}
     	return true;
     }
+
+    // 关注用户
+    public static function follow(Model $model, $arr){
+        if(!$model->account_id){
+            return '请设置账号!';
+        }
+        $accountObj     = Account::where('admin_id', Admin::user()->id)->whereIn('id', $model->account_id)->get()->toArray();
+        if(!$accountObj){
+            return '未发现账号!';
+        }
+
+        $sendArr        = [];
+        foreach($accountObj as $item){
+            $sendArr[$item['did']][$item['id']]     = $item['unique_id'];//$item['nickname'];
+        }
+
+        $msg            = [];
+        foreach($sendArr as $did => $item){
+            $arr['data']['accounts']    = array_values($item);
+            dd($arr);
+            $rs     = WbApi::send(Admin::user()->id, $did, $arr);
+            if($rs != null){
+                $rs     = json_decode($rs, true);
+                if($rs['code'] != 200){
+                    $msg[]  = $rs['msg'];
+                }
+            }else{
+                return 'ws未启动...';
+            }
+        }
+        if($msg){
+            return implode('<br>', $msg);
+        }
+        return true;
+    }
 }
