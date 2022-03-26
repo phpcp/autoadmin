@@ -140,6 +140,7 @@ class TaskController extends AdminController
      * @return Form
      */
     protected function form(){
+
         $form               = new Form(new Task());
         $form->model()->where('admin_id', Admin::user()->id);
         $adminId            = Admin::user()->id;
@@ -195,8 +196,8 @@ class TaskController extends AdminController
             $form->multipleSelect('account_id', __('账号列表'))->options($accounts);
 
             $form->embeds('configs', '', function ($form) use($devices, $accounts, $deviceGroups, $accountGroups){
-                $form->checkbox('type', '关注类型')->options([1 => '用户', 2 => '视频', '3' => '音乐','4'=>'话题','5'=>'直播榜单'])->required();
-                $form->text('search', '搜索内容')->required();
+                $form->checkbox('type', '关注类型')->options([1 => '用户', 2 => '视频', '3' => '音乐','4'=>'话题','5'=>'直播榜单'])->default([1,2,3,4,5]);
+                $form->text('search', '搜索内容');
                 $form->number('total', '关注总数')->min(1)->default(200);
                 $form->number('fans', '粉丝量限制')->min(0)->default(0);
                 $form->number('follow_proportion', '关注比例')->min(1)->default(100);
