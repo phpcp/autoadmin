@@ -17,7 +17,7 @@ class LangToTextsController extends AdminController
      *
      * @var string
      */
-    protected $title = 'TikTok参数--TEXT';
+    protected $title = 'TikTok文本管理';
 
     /**
      * Make a grid builder.

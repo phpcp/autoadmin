@@ -189,11 +189,21 @@ class TaskController extends AdminController
             $form->multipleFile('medias', __('视频'))->removable()->sortable();
             $form->textarea('commant', __('视频标题'))->placeholder('和视频顺序对应,如果不需要文案,则留空行')->rows(14);
         })->when(4, function(Form $form) use($devices, $accounts, $deviceGroups, $accountGroups){// 关注
-            $form->number('media_num', __('关注总数'))->min(1)->default(10);
             $form->multipleSelect('dg', __('设备组'))->options($deviceGroups);
             $form->multipleSelect('device_id', __('手机设备'))->options($devices);
             $form->multipleSelect('ag', __('账号组'))->options($accountGroups);
             $form->multipleSelect('account_id', __('账号列表'))->options($accounts);
+
+            $form->embeds('configs', '', function ($form) use($devices, $accounts, $deviceGroups, $accountGroups){
+                $form->checkbox('type', '关注类型')->options([1 => '用户', 2 => '视频', '3' => '音乐','4'=>'话题','5'=>'直播榜单'])->required();
+                $form->text('search', '搜索内容')->required();
+                $form->number('total', '关注总数')->min(1)->default(200);
+                $form->number('fans', '粉丝量限制')->min(0)->default(0);
+                $form->number('follow_proportion', '关注比例')->min(1)->default(100);
+                $form->divider();
+                $form->number('live_start', '直播榜单开始')->min(1)->default(1);
+                $form->number('live_end', '直播榜单结束')->min(1)->default(10);
+            });
         });
 
 
@@ -202,7 +212,6 @@ class TaskController extends AdminController
             $form->model()->admin_id    = $adminId;
 
             $tskType                    = TaskType::find($form->task_id);
-
             $devices            = [];
             if($form->device_id){
                 $form->device_id    = array_filter($form->device_id);
