@@ -53,7 +53,14 @@ class TasklogController extends AdminController
         $grid->column('did', __('手机'))->display(function($val) use($devices){
             return $devices[$val] ?? '未知';
         })->filter($devices);
-        $grid->column('remark', __('结果'));
+        $grid->column('remark', __('结果/上报数据'))->modal('上报数据', function ($model) {
+            $input = $model->origin;
+            $input = json_decode($input, true);
+            if (empty($input)) {
+                return '<code>{}</code>';
+            } 
+            return '<pre>'.json_encode($input, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_HEX_TAG).'</pre>';
+        });
         $grid->column('status', __('状态'))->using(Task::$status)->label($labels)->filter(Task::$status);
         $grid->column('addtime', __('时间'))->display(function($val){
             return $val ? date('Y-m-d H:i:s', $val) : '';

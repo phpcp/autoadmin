@@ -131,4 +131,44 @@ class AutojsbackController extends Controller{
 		}
 		return true;
 	}
+
+	// 关注回调
+	public function follow(Request $request){
+		// {"code":200,"msg":"成功！","data":[{"username":"domefish0","result":true,"msg":"操作成功！","dataCount":[{"type":"1","typeNum":1,"real":1,"realList":[{"userId":"SEXY","userName":"sexyladyb107","Following":"9802","Followers":"1741","Likes":"3904"}]},{"type":"2","typeNum":1,"real":1,"realList":[{"userId":"vanessamunley","userName":"vanessamunley0","Following":"1004","Followers":"538.2K","Likes":"3.8M"}]},{"type":"3","typeNum":1,"real":1,"realList":[{"userId":"dayami:)","userName":"dayami.lopez","Following":"269","Followers":"28.7K","Likes":"848.5K"}]},{"type":"4","typeNum":1,"real":1,"realList":[{"userId":"Jon Harris","userName":"cowphobia86","Following":"70","Followers":"6.3M","Likes":"113.5M"}]},{"type":"5","typeNum":3,"real":3,"realList":[{"userId":"William White","userName":"whiteyy18","Following":"793","Followers":"1.9M","Likes":"29.5M"},{"userId":"Fikir get","userName":"fifi_aklil","Following":"2021","Followers":"107.4K","Likes":"347.7K"},{"userId":"wilderluke","userName":"wilderluke_teamwilder","Following":"360","Followers":"43.9K","Likes":"182.1K"}]}]}]}
+		// file_put_contents(__DIR__ . '/1.txt', json_encode($request->all()));
+		
+		$rs 	= TaskLog::setTodb($request, function($data, $adminid, $did){
+			if(isset($data['data'])){
+				try {
+					$remark 	= [];
+					$fmt 		= ': 预计关注量(%d), 实际关注数量(%d)';
+					foreach($data['data'] as $item){
+						if($item['result']){
+							$dataCount = $item['dataCount'];
+							$typeNum = 0;
+							$real = 0;
+							foreach ($dataCount as $key => $value) {
+								$typeNum = bcadd($typeNum,$value['typeNum'],0);
+								$real = bcadd($real,$value['real'],0);
+							}
+							$str 		= sprintf($fmt, $typeNum, $real);
+							$remark[]	= $item['username'] . $str;
+						}else{
+							$remark[]	= $item['username'] . ': 执行失败!';
+						}
+					}
+					return implode("\r\n", $remark);
+				} catch (\Exception $e) {
+					return '未捕获到任务状态!' . $e->getMessage();
+				}
+			}else{
+				$msg 	= isset($data['msg']) && $data['msg'] ? $data['msg'] : '开始任务';
+				return $msg;
+			}
+		});
+		if($rs == false){
+			return Responses::error('', null, 404, 404);
+		}
+		return true;
+	}
 }

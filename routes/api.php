@@ -74,7 +74,8 @@ Route::group([
 	Route::post('/raise', 'AutojsbackController@raise')->name('raise');
 	Route::post('/post', 'AutojsbackController@post')->name('post');
 
-
+	Route::post('/follow', 'AutojsbackController@follow')->name('follow');
+	
 	// PC端
 	Route::group([
 		'prefix'		=> 'pc/',

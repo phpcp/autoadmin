@@ -121,7 +121,7 @@ class TaskType extends Model{
         $msg            = [];
         foreach($sendArr as $did => $item){
             $arr['data']['accounts']    = array_values($item);
-            dd($arr);
+            
             $rs     = WbApi::send(Admin::user()->id, $did, $arr);
             if($rs != null){
                 $rs     = json_decode($rs, true);

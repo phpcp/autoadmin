@@ -14,9 +14,9 @@ use App\Models\TiktokVersionButton;
 use App\Models\LangToText;
 use App\Models\Appversion;
 use Illuminate\Support\Facades\Storage;
-
-
 use App\Models\Tkbtns;
+
+use GeoIp2\Database\Reader;
 class AutojsController extends Controller{
 	// 登录脚本
 	public function auth(Request $request){
@@ -225,26 +225,78 @@ class AutojsController extends Controller{
 	//获取当前设备ip
 	public function whereisme(Request $request){
 		$ip 		= $request->getClientIp();
-
-		// $client 	= new \GuzzleHttp\Client();
-		// $headers 	= [
-		// 	'content-type' 		=> 'application/x-www-form-urlencoded; charset=UTF-8',
-		// 	'origin' 			=> 'https://tool.lu',
-		// 	'referer' 			=> 'https://tool.lu/ip/',
-		// 	'accept-language'	=> 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7',
-		// 	'cookie'			=> 'uuid=c0429121-4a8d-4df9-b61c-e788fa556858; Hm_lvt_0fba23df1ee7ec49af558fb29456f532=1645604307,1646301747,1646913300,1647325976; _session=%7B%22slim.flash%22%3A%5B%5D%7D; Hm_lpvt_0fba23df1ee7ec49af558fb29456f532=1647329750; _access=449db14b81cbc95dc8f519abc490e3dc357b2e3bd5df221cca54792cf45c093d',
-		// ];
-		// $body 		= [
-		// 	'ip'	=> '104.144.116.176',
-		// ];
-		// $response 	= $client->post($getUrl, $headers, json_encode($body));
-		// dd($response);
-
+		$location = '';
+        $GeoIp = $this->GeoIp($ip);
+        if( $GeoIp['code'] == 0 ){
+            $IpData = $GeoIp['data'];
+            if( !empty( $IpData['country'] ) ){
+                $country = $IpData['country']['names'];
+                if( !empty($country['zh-CN'] )){
+                    $location = $country['zh-CN'];
+                }else if( empty( $country['en'] )){
+                    $location = $country['en'];
+                }else{
+                    $location = $IpData['country']['iso_code'];
+                }
+            }
+            if( !empty($IpData['city']) ){
+                $city = $IpData['city']['names'];
+                !empty($location)?$location = $location.' - ':'';
+                if( !empty($city['zh-CN'] )){
+                    $location = $location.$city['zh-CN'];
+                }else if( empty( $city['en'] )){
+                    $location = $location.$city['en'];
+                }
+            }
+        }
 		$arr 		= [
 			'ip'		=> $ip,
-			'location'	=> '功能完善中...'
+			'location'	=> $location
 		];
 		// return Responses::error('错误!');
 		return Responses::success($arr, '更新成功!');
 	}
+	public function GeoIp($ip = '')
+    {
+        $ip = empty($ip)?$_SERVER["REMOTE_ADDR"]:$ip;
+        $reader = new Reader(public_path().'/GeoLite2-City.mmdb');
+        try {
+            $record = $reader->city($ip);
+            $array = json_decode(json_encode($record),TRUE);
+            // dd($array['city']);                          //城市
+            // dd($array['continent']);                     //州
+            // dd($array['country']);                       //国家
+            // dd($array['location']);                      //坐标/时区
+            // dd($array['registered_country']);            //注册国家
+            // dd($array['subdivisions']);                  //归属地 
+            // dd($array['traits']);                        //互联网协议地址
+            $response = [
+                'code' => 0,
+                'data'  => $array,
+                'msg'=> '获取成功！'
+            ];
+            return $response;
+        } catch (\GeoIp2\Exception\AddressNotFoundException $e) {
+            $response = [
+                'code' => 1,
+                'data'  => [],
+                'msg'=> '输入IP没有找到记录！'
+            ];
+            return $response;
+        } catch (\MaxMind\Db\InvalidDatabaseExceptionn $e) {
+            $response = [
+                'code' => 1,
+                'data'  => [],
+                'msg'=> '数据库无效或损坏！'
+            ];
+            return $response;
+        }catch ( \Exception $e ){
+            $response = [
+                'code' => 1,
+                'data'  => [],
+                'msg'=> '其他错误！'
+            ];
+            return $response;
+        }
+    }
 }
